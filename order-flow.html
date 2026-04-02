@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frive Order Flow</title>
+  <style>
+    /* ── Frive Fonts ── */
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 900; 
+      src: url("fonts/JokkerTRIAL-Heavy.otf") format("opentype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 700; 
+      font-style: normal; 
+      src: url("fonts/FriveJokker-Bold.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 700; 
+      font-style: italic; 
+      src: url("fonts/FriveJokker-BoldItalic.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 500; 
+      font-style: normal; 
+      src: url("fonts/FriveJokker-Medium.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 500; 
+      font-style: italic; 
+      src: url("fonts/FriveJokker-MediumItalic.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 400; 
+      font-style: normal; 
+      src: url("fonts/FriveJokker-Regular.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 400; 
+      font-style: italic; 
+      src: url("fonts/FriveJokker-RegularItalic.ttf") format("truetype"); 
+      font-display: swap;
+    }
+
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: FriveJokker, Arial, sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      color: #000;
+      background: #fffdf8;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    button { font-family: FriveJokker, Arial, sans-serif; background: none; border: none; cursor: pointer; }
+    input { font-family: FriveJokker, Arial, sans-serif; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Colours ── */
+    :root {
+      --kale: #053827;
+      --lime: #c6fa5f;
+      --cream: #fffdf8;
+      --cream-banner: #fbf8f1;
+      --grey-60: #666;
+      --grey-80: #333;
+      --border: #e9e9e9;
+      --highlight: #9c3616;
+    }
+
+    /* ════════════════════════════════
+       STICKY HEADER
+    ════════════════════════════════ */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #fff;
+    }
+
+    /* ── Logo row ── */
+    .order-header-main {
+      background: #fff;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .header-inner {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .back-button {
+      position: absolute;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--kale);
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .back-button.visible { opacity: 1; pointer-events: all; }
+
+    /* ── Step nav ── */
+    .step-buttons {
+      background: #fff;
+      padding-top: 16px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .step-nav-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      position: relative;
+      --progress: 0%;
+    }
+    /* Continuous progress line background */
+    .step-nav-wrapper::before {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+    /* Filled progress line */
+    .step-nav-wrapper::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      height: 2px;
+      width: var(--progress);
+      background: var(--kale);
+      z-index: 1;
+      transition: width 0.4s ease;
+    }
+    .order-flow-button {
+      display: block;
+      padding: 0 0 12px;
+      background: none;
+      border: none;
+      color: var(--grey-60);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      position: relative;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.2s;
+      z-index: 2;
+    }
+    .order-flow-button::after {
+      display: none; /* Remove individual step underlines */
+    }
+    .order-flow-button.active {
+      color: var(--grey-80);
+    }
+    .order-flow-button.completed {
+      color: var(--grey-60);
+    }
+
+    /* Mobile: inactive = number only, active = "N . Label" */
+    .step-full { display: inline; }
+    .step-short { display: none; }
+
+    /* ── Info / Voucher bar ── */
+    .info-bar-wrap {
+      background: var(--cream-banner);
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+    /* voucher banner */
+    .bar-voucher { display: block; }
+    .bar-calories { display: none; }
+    .bar-voucher b, .bar-calories b { font-weight: 700; }
+    .bar-calories .kcal { text-decoration: underline; text-decoration-style: dotted; font-weight: 700; }
+    .bar-calories .strike { text-decoration: line-through; color: var(--grey-60); margin: 0 3px; }
+    .bar-calories .sale { font-weight: 700; background: var(--lime); padding: 1px 3px; }
+
+    /* ════════════════════════════════
+       FORM AREA
+    ════════════════════════════════ */
+    .form-area {
+      flex: 1;
+      padding: 0 0 120px;
+    }
+    .step-content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 20px 100px;
+    }
+    .step-content.wide { max-width: 960px; }
+
+    /* ── Step headings ── */
+    .step-header { margin-bottom: 20px; }
+    .step-header.center { text-align: center; }
+    .sub-headline {
+      font-size: clamp(20px, 4vw, 26px);
+      font-weight: 700;
+      line-height: 1.25;
+      color: #000;
+      margin-bottom: 6px;
+    }
+    .step-subtitle { font-size: 14px; color: var(--grey-80); line-height: 1.4; }
+
+    /* ── Goal Banner ── */
+    .goal-banner {
+      background: var(--lime);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-top: 20px;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideDown 0.3s ease;
+    }
+    .goal-banner-icon {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .goal-banner-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--kale);
+      line-height: 1.4;
+    }
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ════════════════════════════════
+       CARD — shared base
+    ════════════════════════════════ */
+    .ofl {                         /* order-flow-label base */
+      display: flex;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: outline 0.08s;
+    }
+    .ofl:hover { outline: 1px solid var(--grey-80); }
+    .ofl.selected { outline: 2px solid var(--grey-80); }
+    .ofl.selected .card-text { color: #000; font-weight: 700; }
+    .card-text { font-size: 14px; color: var(--grey-60); text-align: center; }
+
+    /* ── GOALS — 3-col icon grid ── */
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .goal-card {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 14px;
+      min-height: 110px;
+      position: relative;
+    }
+    .goal-card .goal-icon-wrap {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .goal-card img { width: 32px; height: 32px; object-fit: contain; }
+    .goal-card .card-text { font-size: 13px; text-align: left; line-height: 1.3; }
+    /* selected: icon replaced by green circle checkmark */
+    .goal-card .check-icon {
+      display: none;
+      width: 36px; height: 36px;
+      background: var(--kale);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+    }
+    .goal-card.selected .check-icon { display: flex; }
+    .goal-card.selected img { display: none; }
+
+    /* ── SERVINGS — single col stacked ── */
+    .servings-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .serving-card {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 16px;
+      gap: 6px;
+    }
+    .serving-icons { display: flex; gap: 6px; align-items: center; justify-content: center; }
+    .serving-card .card-text { font-size: 15px; }
+
+    /* ── MEALS — single col stacked ── */
+    .meals-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .meal-card {
+      align-items: center;
+      justify-content: center;
+      padding: 22px 16px;
+    }
+    .meal-card .card-text { font-size: 15px; }
+
+    /* ── DAYS — single col stacked ── */
+    .days-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .day-card {
+      align-items: center;
+      justify-content: center;
+      padding: 22px 16px;
+    }
+    .day-card .card-text { font-size: 18px; }
+
+    /* ── BREAKFAST checkbox ── */
+    .breakfast-section {
+      margin-top: 32px;
+    }
+    .breakfast-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+    .bfast-box {
+      width: 28px; height: 28px; flex-shrink: 0;
+      border: 1.5px solid var(--kale);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bfast-box.checked { background: var(--kale); }
+    .bfast-box.checked::after {
+      content: "";
+      width: 14px; height: 8px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg) translateY(-2px);
+      display: block;
+    }
+    .bfast-label { font-size: 14px; font-weight: 500; }
+
+    /* ── BREAKFAST SHOWCASE CARDS ── */
+    #breakfastShowcaseWrapper {
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .sneak-peak-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--grey-80);
+      margin-bottom: 12px;
+      margin-top: 8px;
+    }
+    .breakfast-showcase {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 480px;
+    }
+    .breakfast-card-loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 20px;
+      color: var(--grey-60);
+      font-size: 14px;
+    }
+    .breakfast-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .breakfast-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .breakfast-card-img {
+      width: 100%;
+      height: 0;
+      flex: 1;
+      object-fit: cover;
+      display: block;
+    }
+    .breakfast-card-content {
+      padding: 10px 8px;
+    }
+    .breakfast-card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #000;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    /* Hide breakfast details - no longer needed */
+    .breakfast-badges,
+    .breakfast-badge,
+    .breakfast-card-desc,
+    .breakfast-card-nutrition,
+    .breakfast-kcal,
+    .breakfast-protein {
+      display: none;
+    }
+
+    /* ── GATEKEEPER QUESTION ── */
+    .gatekeeper-section {
+      display: block;
+    }
+    .gatekeeper-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      max-width: 500px;
+      margin: 32px auto 0;
+    }
+    .gatekeeper-btn {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--grey-80);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: FriveJokker, Arial, sans-serif;
+    }
+    .gatekeeper-btn:hover {
+      outline: 1px solid var(--grey-80);
+    }
+    .gatekeeper-btn.selected {
+      outline: 2px solid var(--grey-80);
+      color: #000;
+      font-weight: 700;
+    }
+
+    /* ── ALLERGENS ── */
+    .allergen-content {
+      animation: slideDown 0.3s ease;
+    }
+    .allergen-header { text-align: center; margin-bottom: 20px; }
+    .allergen-header h2 { font-size: clamp(18px, 4vw, 24px); font-weight: 700; margin-bottom: 6px; }
+    .allergen-subtitle { font-size: 14px; color: var(--grey-80); }
+    .allergen-pills {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .allergy-pill {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 4px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--grey-60);
+      cursor: pointer;
+      font-family: FriveJokker, Arial, sans-serif;
+    }
+    .allergy-pill:hover { outline: 1px solid var(--grey-80); }
+    .allergy-pill.selected { outline: 2px solid var(--grey-80); color: #000; font-weight: 700; }
+
+    /* Ingredient removal dropdown */
+    .ingredient-section { margin-bottom: 24px; }
+    .ingredient-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; text-align: center; }
+    .ingredient-section p { font-size: 13px; color: var(--grey-60); text-align: center; margin-bottom: 12px; }
+
+    /* Custom multi-select */
+    .custom-multiselect { position: relative; }
+    .cms-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 44px 14px 16px;
+      font-family: FriveJokker, Arial, sans-serif;
+      font-size: 14px;
+      color: var(--grey-60);
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cms-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 0 0 6px 6px;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .cms-dropdown.open { display: block; }
+    .cms-option {
+      padding: 12px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+    }
+    .cms-option:last-child { border-bottom: none; }
+    .cms-option:hover { background: var(--cream-banner); }
+    .cms-option.selected { font-weight: 700; }
+    .cms-arrow {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    /* ── PREFERENCES ── */
+    .pref-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .pref-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 0;
+      min-height: 140px;
+      overflow: hidden;
+      transition: outline 0.08s;
+    }
+    .pref-card:hover { outline: 1px solid var(--grey-80); }
+    .pref-card.selected { outline: 2px solid var(--grey-80); }
+    .pref-card-inner { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      width: 100%; 
+      flex: 1; 
+      padding: 16px 8px;
+    }
+    .pref-card-icon { width: 38px; height: 38px; object-fit: contain; margin-bottom: 8px; }
+    .pref-card-label { font-size: 13px; color: var(--grey-60); text-align: center; line-height: 1.3; }
+    .pref-card.selected .pref-card-label { color: #000; font-weight: 700; }
+    .pref-price-bar {
+      width: 100%;
+      background: var(--cream-banner);
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 12px;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.4;
+    }
+    .pref-price-strike { text-decoration: line-through; color: var(--grey-60); margin-right: 3px; }
+    .pref-price-sale { font-weight: 700; background: var(--lime); padding: 1px 2px; }
+    .pref-price-per { color: var(--grey-60); display: block; }
+
+    /* Allergen notice */
+    .allergen-notice {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--highlight);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .allergen-notice.visible { display: flex; }
+
+    /* ── STICKY NEXT BUTTON ── */
+    .sticky-btn-wrap {
+      position: fixed;
+      bottom: 0; 
+      left: 0; 
+      right: 0;
+      padding: 12px 20px 20px;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      z-index: 100;
+      max-width: 100vw;
+      box-sizing: border-box;
+    }
+    .button-primary {
+      background: var(--kale);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 0 48px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      height: 52px;
+      width: 100%;
+      max-width: 600px;
+      font-family: FriveJokker, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .button-primary:hover { background: #074530; }
+    .button-primary svg { flex-shrink: 0; }
+
+    /* ── Visibility & Animations ── */
+    .step-panel { 
+      display: none; 
+      opacity: 0;
+      transform: translateX(30px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .step-panel.active { 
+      display: block; 
+      animation: slideIn 0.5s ease forwards;
+    }
+    .step-panel.exiting {
+      display: block;
+      animation: slideOut 0.4s ease forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+    }
+
+    /* ════════════════════════════════
+       DESKTOP OVERRIDES (≥ 768px)
+    ════════════════════════════════ */
+    @media (min-width: 768px) {
+      .step-nav-wrapper { padding: 0 60px; gap: 16px; }
+      .order-flow-button { font-size: 15px; text-align: left; }
+
+      /* show full label on desktop always */
+      .step-full { display: inline; }
+      .step-short { display: none; }
+
+      /* multi-col layouts on desktop */
+      .servings-list {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .serving-card { padding: 24px 16px; min-height: 90px; }
+
+      .meals-list {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .meal-card { padding: 24px 16px; min-height: 72px; }
+
+      .days-list {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        max-width: 740px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .pref-grid { gap: 12px; }
+
+      .allergen-pills { gap: 8px; }
+    }
+
+    /* ════════════════════════════════
+       MOBILE (< 768px)
+    ════════════════════════════════ */
+    @media (max-width: 767px) {
+      /* Step nav: make active step more prominent */
+      .step-nav-wrapper { 
+        padding: 0 12px; 
+        gap: 0; 
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        justify-content: space-evenly;
+      }
+      
+      .order-flow-button { 
+        text-align: center; 
+        font-size: 12px; 
+        white-space: nowrap;
+        flex-shrink: 0;
+        flex: 1;
+        min-width: 32px;
+        max-width: 48px;
+        scroll-snap-align: center;
+        padding: 0 4px 12px;
+      }
+      
+      /* Inactive steps: show only number */
+      .step-full { display: none; }
+      .step-short { display: inline; }
+      
+      /* Active step: show full text and make it wider */
+      .order-flow-button.active { 
+        flex-grow: 2;
+        min-width: auto;
+        max-width: none;
+        font-weight: 600;
+      }
+      .order-flow-button.active .step-full { display: inline; }
+      .order-flow-button.active .step-short { display: none; }
+
+      /* Goals keep 3-col but smaller */
+      .goals-grid { gap: 8px; }
+      .goal-card { min-height: 90px; padding: 12px 10px; }
+
+      /* Breakfast cards smaller on mobile */
+      .breakfast-showcase { gap: 8px; max-width: 100%; }
+      .breakfast-card-content { padding: 8px 6px; }
+      .breakfast-card-title { font-size: 11px; }
+
+      /* Voucher / info bar smaller */
+      .info-bar-wrap { font-size: 13px; padding: 10px 16px; }
+
+      .step-content { padding: 20px 16px 100px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     STICKY HEADER
+════════════════════════════════════════════ -->
+<div class="sticky-header">
+
+  <!-- Logo -->
+  <header class="order-header-main">
+    <div class="header-inner">
+      <button class="back-button" id="backBtn" onclick="goBack()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M7.40332 12C7.40332 12.3073 7.52083 12.5695 7.7649 12.8045L14.8157 19.7017C15.0056 19.9006 15.2587 20 15.548 20C16.1355 20 16.5965 19.548 16.5965 18.9514C16.5965 18.6621 16.479 18.4 16.2802 18.2011L9.92535 12L16.2802 5.79887C16.479 5.59096 16.5965 5.32881 16.5965 5.03955C16.5965 4.45198 16.1355 4 15.548 4C15.2587 4 15.0056 4.09944 14.8157 4.29831L7.7649 11.1955C7.52083 11.4305 7.41236 11.6927 7.40332 12Z" fill="#333"/>
+        </svg>
+        <span>Go back</span>
+      </button>
+      <a href="/" aria-label="Frive Home">
+        <svg width="60" height="32" viewBox="0 0 64 34" fill="none">
+          <path d="M27.1093 5.47436L39.8848 0.518036C40.1147 0.428684 40.3738 0.6858 40.3428 0.970268L39.9012 5.01301C39.8118 5.82265 39.2243 6.54659 38.396 6.86752L32.499 9.15604C31.6688 9.4788 30.7474 9.34021 30.1362 8.80228L27.0801 6.11623C26.8611 5.92659 26.8794 5.56189 27.1093 5.47436Z" fill="#053827"/>
+          <path d="M29.4721 33.5C29.2732 33.5 29.1108 33.3377 29.1108 33.1389V10.8009C29.1108 10.6021 29.2732 10.4398 29.4721 10.4398H34.5133C34.7122 10.4398 34.8746 10.6021 34.8746 10.8009V33.1371C34.8746 33.3359 34.7122 33.4982 34.5133 33.4982H29.4721V33.5Z" fill="#053827"/>
+          <path d="M53.1494 33.5C52.9505 33.5 52.7881 33.3377 52.7881 33.1389V4.59177C52.7881 4.39301 52.9505 4.23072 53.1494 4.23072H63.6387C63.8376 4.23072 64 4.39301 64 4.59177V8.89345C64 9.09221 63.8376 9.25451 63.6387 9.25451H58.8931C58.6942 9.25451 58.5318 9.4168 58.5318 9.61556V15.9578C58.5318 16.1565 58.6942 16.3188 58.8931 16.3188H62.482C62.6808 16.3188 62.8432 16.4811 62.8432 16.6799V20.7718C62.8432 20.9706 62.6808 21.1329 62.482 21.1329H58.8931C58.6942 21.1329 58.5318 21.2952 58.5318 21.494V28.1079C58.5318 28.3066 58.6942 28.4689 58.8931 28.4689H63.6387C63.8376 28.4689 64 28.6312 64 28.83V33.1316C64 33.3304 63.8376 33.4927 63.6387 33.4927H53.1494V33.5Z" fill="#053827"/>
+          <path d="M20.924 16.0161C20.6722 16.6124 20.2453 16.9096 19.6414 16.9096H18.7838C18.5831 16.9096 18.4226 16.7473 18.4226 16.5486V9.36574C18.4226 9.16516 18.585 9.00469 18.7838 9.00469H19.5574C20.0063 9.00469 20.3566 9.13416 20.6084 9.3931C20.862 9.65386 21.0408 10.0587 21.1466 10.613C21.2525 11.1656 21.3035 11.9278 21.3035 12.8942C21.3035 14.3786 21.1776 15.4198 20.924 16.0161ZM27.1531 31.9755C27.0126 31.31 26.9195 30.5003 26.8794 29.5466C26.8648 29.0415 26.852 28.509 26.8374 27.9492C26.821 27.3876 26.8082 26.8059 26.7936 26.2023C26.8082 25.5586 26.8082 24.9131 26.7936 24.2675C26.779 23.6238 26.7663 22.9856 26.7517 22.3547C26.7079 21.4994 26.5546 20.7609 26.2882 20.1373C26.0237 19.5136 25.6077 19.0267 25.0475 18.6748C24.8103 18.5271 24.5458 18.4086 24.252 18.3174C24.0969 18.27 24.0769 18.0566 24.2228 17.9837C24.6242 17.7849 24.98 17.5351 25.2884 17.2342C25.885 16.6525 26.3229 15.9103 26.6039 15.0059C26.8849 14.1014 27.0254 13.0328 27.0254 11.8001C27.0254 10.1736 26.8101 8.80592 26.3831 7.69905C25.956 6.59399 25.2884 5.75011 24.3797 5.16801C23.471 4.5877 22.3253 4.29755 20.9422 4.29755H13.0481C12.8511 4.29755 12.6905 4.45984 12.6905 4.65861V33.1371C12.6905 33.3359 12.8529 33.4982 13.0481 33.4982H18.0675C18.2663 33.4982 18.4269 33.3359 18.4269 33.1371V22.1177C18.4269 21.9189 18.5893 21.7566 18.7881 21.7566H19.3709C20.0922 21.7566 20.6706 22.0559 21.1011 22.6545C21.5297 23.2531 21.7961 24.2291 21.9002 25.5823L22.3253 31.9664C22.3399 32.1451 22.3636 32.3037 22.399 32.4422C22.4856 32.8051 22.6972 33.0734 23.0348 33.2466C23.2044 33.3323 23.4181 33.377 23.6716 33.377H27.0527C27.2516 33.377 27.4011 33.3068 27.4776 33.1644C27.5523 33.0257 27.5559 32.8434 27.4739 32.6281L27.1531 31.9755Z" fill="#053827"/>
+          <path d="M51.3631 4.64101L47.402 33.1882C47.3765 33.3669 47.2232 33.5 47.0426 33.5H39.8666C39.6859 33.5 39.5327 33.3669 39.5071 33.1882L36.1609 9.20892C36.1299 8.99192 36.2996 8.79681 36.5203 8.79681H41.5269C41.713 8.79681 41.8681 8.93722 41.8864 9.12322L43.4609 25.141C43.4828 25.358 43.8003 25.358 43.8222 25.141L45.8128 4.55531C45.831 4.36931 45.9861 4.2289 46.1741 4.2289H51.0055C51.2244 4.2289 51.3941 4.42219 51.3631 4.64101Z" fill="#053827"/>
+          <path d="M0 33.1371V4.59177C0 4.39119 0.162386 4.23072 0.361262 4.23072H10.7886C10.9893 4.23072 11.1499 4.39301 11.1499 4.59177V8.87157C11.1499 9.07215 10.9875 9.23262 10.7886 9.23262H6.10497C5.90427 9.23262 5.74371 9.39492 5.74371 9.59368V15.9778C5.74371 16.1784 5.90609 16.3389 6.10497 16.3389H9.86173C10.0624 16.3389 10.223 16.5012 10.223 16.6999V20.7919C10.223 20.9925 10.0606 21.153 9.86173 21.153H6.10497C5.90427 21.153 5.74371 21.3153 5.74371 21.514V33.1335C5.74371 33.3341 5.58132 33.4945 5.38244 33.4945H0.361262C0.162386 33.5 0 33.3377 0 33.1371Z" fill="#053827"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Step nav -->
+  <div class="step-buttons">
+    <nav class="step-nav-wrapper">
+      <button class="order-flow-button active" data-step="1">
+        <span class="step-full">1 . Goals</span><span class="step-short">1</span>
+      </button>
+      <button class="order-flow-button" data-step="2">
+        <span class="step-full">2 . Servings</span><span class="step-short">2</span>
+      </button>
+      <button class="order-flow-button" data-step="3">
+        <span class="step-full">3 . Meals</span><span class="step-short">3</span>
+      </button>
+      <button class="order-flow-button" data-step="4">
+        <span class="step-full">4 . Days</span><span class="step-short">4</span>
+      </button>
+      <button class="order-flow-button" data-step="5">
+        <span class="step-full">5 . Allergens</span><span class="step-short">5</span>
+      </button>
+      <button class="order-flow-button" data-step="6">
+        <span class="step-full">6 . Preferences</span><span class="step-short">6</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Info / voucher bar — content swaps per step -->
+  <div class="info-bar-wrap">
+    <div class="bar-voucher" id="barVoucher">
+      Get <b>50% OFF</b> week 1 + <b>30% off</b> week 2 + <b>20% off</b> weeks 3-4
+    </div>
+    <div class="bar-calories" id="barCalories">
+      <div>Your average daily calories <span class="kcal">1172Kcal.</span></div>
+      <div class="price-line">From <span class="strike">£7.49</span> <span class="sale">£3.74</span> per meal</div>
+    </div>
+  </div>
+
+</div><!-- /sticky-header -->
+
+
+<!-- ══════════════════════════════════════════
+     FORM
+════════════════════════════════════════════ -->
+<form class="form-area" id="orderForm">
+
+  <!-- ─── STEP 1: GOALS ─── -->
+  <div class="step-panel active" id="step-1">
+    <div class="step-content">
+      <div class="step-header">
+        <h2 class="sub-headline">What is your main goal?</h2>
+        <p class="step-subtitle">Select a goal to personalise your plan.</p>
+      </div>
+      
+      <div class="goals-grid">
+        <label class="ofl goal-card" onclick="toggleGoal(this)" data-goal="Improve overall health" data-icon="https://cloudfront.frive.co.uk/media/7050/icon_(1).svg" data-message="Our balanced meals provide essential nutrients to support your overall wellbeing.">
+          <div class="goal-icon-wrap">
+            <img src="https://cloudfront.frive.co.uk/media/7050/icon_(1).svg" alt="">
+            <div class="check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <span class="card-text">Improve overall health</span>
+        </label>
+        <label class="ofl goal-card" onclick="toggleGoal(this)" data-goal="Support my GLP-1 journey" data-icon="https://cloudfront.frive.co.uk/media/7037/icon_(10).svg" data-message="Our nutritious meals are designed to complement your GLP-1 medication journey.">
+          <div class="goal-icon-wrap">
+            <img src="https://cloudfront.frive.co.uk/media/7037/icon_(10).svg" alt="">
+            <div class="check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <span class="card-text">Support my GLP-1 journey</span>
+        </label>
+        <label class="ofl goal-card" onclick="toggleGoal(this)" data-goal="Build muscle" data-icon="https://cloudfront.frive.co.uk/media/7046/muscle_(1).svg" data-message="Our meals have up to 40g of protein to help you build muscle.">
+          <div class="goal-icon-wrap">
+            <img src="https://cloudfront.frive.co.uk/media/7046/muscle_(1).svg" alt="">
+            <div class="check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <span class="card-text">Build muscle</span>
+        </label>
+        <label class="ofl goal-card" onclick="toggleGoal(this)" data-goal="Lose weight" data-icon="https://cloudfront.frive.co.uk/media/7053/icon_(4).svg" data-message="Our calorie-controlled meals make it easy to manage your weight loss journey.">
+          <div class="goal-icon-wrap">
+            <img src="https://cloudfront.frive.co.uk/media/7053/icon_(4).svg" alt="">
+            <div class="check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <span class="card-text">Lose weight</span>
+        </label>
+        <label class="ofl goal-card" onclick="toggleGoal(this)" data-goal="Increase energy levels" data-icon="https://cloudfront.frive.co.uk/media/7054/icon_(5).svg" data-message="Our nutrient-rich meals provide sustained energy throughout your day.">
+          <div class="goal-icon-wrap">
+            <img src="https://cloudfront.frive.co.uk/media/7054/icon_(5).svg" alt="">
+            <div class="check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <span class="card-text">Increase energy levels</span>
+        </label>
+        <label class="ofl goal-card" onclick="toggleGoal(this)" data-goal="Improve fitness" data-icon="https://cloudfront.frive.co.uk/media/7055/icon_(6).svg" data-message="Our meals are designed to fuel your workouts and support your fitness goals.">
+          <div class="goal-icon-wrap">
+            <img src="https://cloudfront.frive.co.uk/media/7055/icon_(6).svg" alt="">
+            <div class="check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <span class="card-text">Improve fitness</span>
+        </label>
+      </div>
+      
+      <!-- Goal Banner (initially hidden, shown below goals) -->
+      <div class="goal-banner" id="goalBanner" style="display: none;">
+        <img class="goal-banner-icon" id="goalBannerIcon" src="" alt="">
+        <span class="goal-banner-text" id="goalBannerText"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STEP 2: SERVINGS ─── -->
+  <div class="step-panel" id="step-2">
+    <div class="step-content">
+      <div class="step-header">
+        <h2 class="sub-headline">How many people will be eating?</h2>
+      </div>
+      <!-- Single col on mobile, 4-col on desktop (via CSS) -->
+      <div class="servings-list">
+        <label class="ofl serving-card" onclick="selectRadio(this, '#step-2 .serving-card')" data-value="1">
+          <div class="serving-icons">
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+          </div>
+          <span class="card-text">Just me</span>
+        </label>
+        <label class="ofl serving-card" onclick="selectRadio(this, '#step-2 .serving-card')" data-value="2">
+          <div class="serving-icons">
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+          </div>
+          <span class="card-text">Two of us</span>
+        </label>
+        <label class="ofl serving-card" onclick="selectRadio(this, '#step-2 .serving-card')" data-value="3">
+          <div class="serving-icons">
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+          </div>
+          <span class="card-text">Three of us</span>
+        </label>
+        <label class="ofl serving-card" onclick="selectRadio(this, '#step-2 .serving-card')" data-value="4">
+          <div class="serving-icons">
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 25" fill="none"><path d="M12.7466 11.4436C14.7712 11.4436 16.4186 9.79674 16.4186 7.77162C16.4186 5.74707 14.7712 4.09961 12.7466 4.09961C10.7221 4.09961 9.07461 5.74707 9.07461 7.77162C9.07461 9.79674 10.7221 11.4436 12.7466 11.4436ZM21.4032 19.1413L19.12 14.7483C18.6626 13.869 17.6779 13.3065 16.595 13.3072L12.7466 13.3086L8.89813 13.3078C7.81519 13.3073 6.83054 13.87 6.37316 14.7493L4.09017 19.1426C3.92924 19.4517 4.11012 19.8571 4.4095 19.8573L12.7467 19.8566L21.0839 19.856C21.3833 19.8559 21.5641 19.4503 21.4032 19.1413Z" fill="#666"/></svg>
+          </div>
+          <span class="card-text">Four of us</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STEP 3: MEALS ─── -->
+  <div class="step-panel" id="step-3">
+    <div class="step-content">
+      <div class="step-header">
+        <h2 class="sub-headline">How many meals per day?</h2>
+      </div>
+      <div class="meals-list">
+        <label class="ofl meal-card" onclick="selectRadio(this, '#step-3 .meal-card')" data-value="1">
+          <span class="card-text">1 meal</span>
+        </label>
+        <label class="ofl meal-card selected" onclick="selectRadio(this, '#step-3 .meal-card')" data-value="2">
+          <span class="card-text">2 meals</span>
+        </label>
+        <label class="ofl meal-card" onclick="selectRadio(this, '#step-3 .meal-card')" data-value="3">
+          <span class="card-text">3 meals</span>
+        </label>
+        <label class="ofl meal-card" onclick="selectRadio(this, '#step-3 .meal-card')" data-value="4">
+          <span class="card-text">4 meals</span>
+        </label>
+      </div>
+      
+      <!-- Include Breakfasts Section -->
+      <div class="breakfast-section">
+        <label class="breakfast-row" onclick="toggleBreakfast(this)">
+          <span class="bfast-box" id="bfastBox"></span>
+          <span class="bfast-label">Include breakfasts</span>
+        </label>
+        
+        <!-- Breakfast Showcase Cards -->
+        <div id="breakfastShowcaseWrapper" style="display: none;">
+          <h3 class="sneak-peak-title">Sneak peak</h3>
+          <div class="breakfast-showcase" id="breakfastShowcase">
+            <!-- Cards will be populated dynamically from API -->
+            <div class="breakfast-card-loading">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STEP 4: DAYS ─── -->
+  <div class="step-panel" id="step-4">
+    <div class="step-content">
+      <div class="step-header center">
+        <h2 class="sub-headline">How many days a week will you be having Frive meals?</h2>
+      </div>
+      <div class="days-list">
+        <label class="ofl day-card" onclick="selectRadio(this, '#step-4 .day-card')" data-value="3">
+          <span class="card-text">3</span>
+        </label>
+        <label class="ofl day-card selected" onclick="selectRadio(this, '#step-4 .day-card')" data-value="4">
+          <span class="card-text">4</span>
+        </label>
+        <label class="ofl day-card" onclick="selectRadio(this, '#step-4 .day-card')" data-value="5">
+          <span class="card-text">5</span>
+        </label>
+        <label class="ofl day-card" onclick="selectRadio(this, '#step-4 .day-card')" data-value="6">
+          <span class="card-text">6</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STEP 5: ALLERGENS ─── -->
+  <div class="step-panel" id="step-5">
+    <div class="step-content">
+      
+      <!-- Gatekeeper Question -->
+      <div class="gatekeeper-section" id="allergenGatekeeper">
+        <div class="step-header center">
+          <h2 class="sub-headline">Would you like to exclude any allergens or ingredients from your plan?</h2>
+        </div>
+        <div class="gatekeeper-buttons">
+          <button type="button" class="gatekeeper-btn" onclick="answerAllergenQuestion('no')">No</button>
+          <button type="button" class="gatekeeper-btn" onclick="answerAllergenQuestion('yes')">Yes</button>
+        </div>
+      </div>
+
+      <!-- Allergen/Ingredient Selection (initially hidden) -->
+      <div class="allergen-content" id="allergenContent" style="display: none;">
+        <div class="allergen-header">
+          <h2>Select any allergies</h2>
+          <p class="allergen-subtitle" style="color:var(--kale); font-weight:600;">We are 100% gluten and dairy free</p>
+        </div>
+        <div class="allergen-pills">
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Celery</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Crustaceans</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Eggs</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Fish</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Gluten</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Gluten-Free Oats</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Lupin</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Milk</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Molluscs</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Mustard</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Peanuts</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Sesame Seeds</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Soya</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Sulphites</button>
+          <button type="button" class="allergy-pill" onclick="toggleAllergen(this)">Tree Nuts</button>
+        </div>
+        <div class="ingredient-section">
+          <h3>Remove ingredients</h3>
+          <p>You can remove up to three</p>
+          <div class="custom-multiselect">
+            <div class="cms-input" onclick="toggleCMS()">
+              <span id="cmsPlaceholder">Select items</span>
+              <svg class="cms-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" id="cmsArrow">
+                <path d="M4 6l4 4 4-4" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="cms-dropdown" id="cmsDropdown">
+              <div class="cms-option" onclick="selectIngredient(this)">Almond</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Aubergine</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Avocado</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Banana</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Beans</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Beef</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Bell Pepper</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Broccoli</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Carrot</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Chicken</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Chilli</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Courgette</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Lamb</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Lentils</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Mushroom</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Onion</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Peas</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Pork</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Potato</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Salmon</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Spinach</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Sweet Potato</div>
+              <div class="cms-option" onclick="selectIngredient(this)">Tomato</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- ─── STEP 6: PREFERENCES ─── -->
+  <div class="step-panel" id="step-6">
+    <div class="step-content">
+      <div class="step-header">
+        <h2 class="sub-headline">What type of meals would you like?</h2>
+        <p class="step-subtitle" style="margin-top:8px;">You will still have access to our full menu.</p>
+      </div>
+      <div class="allergen-notice" id="allergenNotice">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" fill="#9c3616"/>
+        </svg>
+        <span id="allergenNoticeText">Your allergens: None</span>
+      </div>
+      <div class="pref-grid">
+        <button type="button" class="pref-card" onclick="togglePref(this)" data-preference="4">
+          <div class="pref-card-inner">
+            <img class="pref-card-icon" src="https://cloudfront.frive.co.uk/media/7038/icon_(11).svg" alt="Meat">
+            <span class="pref-card-label">Meat</span>
+          </div>
+          <div class="pref-price-bar">
+            <span><span class="pref-price-strike">£7.49</span> <span class="pref-price-sale">£3.74</span></span>
+            <span class="pref-price-per">per meal</span>
+          </div>
+        </button>
+        <button type="button" class="pref-card" onclick="togglePref(this)" data-preference="5">
+          <div class="pref-card-inner">
+            <img class="pref-card-icon" src="https://cloudfront.frive.co.uk/media/7039/icon_(12).svg" alt="Fish">
+            <span class="pref-card-label">Fish</span>
+          </div>
+          <div class="pref-price-bar">
+            <span><span class="pref-price-strike">£8.49</span> <span class="pref-price-sale">£4.24</span></span>
+            <span class="pref-price-per">per meal</span>
+          </div>
+        </button>
+        <button type="button" class="pref-card" onclick="togglePref(this)" data-preference="6">
+          <div class="pref-card-inner">
+            <img class="pref-card-icon" src="https://cloudfront.frive.co.uk/media/7040/icon_(13).svg" alt="Vegan &amp; Vegetarian">
+            <span class="pref-card-label">Vegan &amp; Vegetarian</span>
+          </div>
+          <div class="pref-price-bar">
+            <span><span class="pref-price-strike">£7.49</span> <span class="pref-price-sale">£3.74</span></span>
+            <span class="pref-price-per">per meal</span>
+          </div>
+        </button>
+        <button type="button" class="pref-card" onclick="togglePref(this)" data-preference="1">
+          <div class="pref-card-inner">
+            <img class="pref-card-icon" src="https://cloudfront.frive.co.uk/media/7037/icon_(10).svg" alt="Frive Favourites">
+            <span class="pref-card-label">Frive Favourites</span>
+          </div>
+        </button>
+        <button type="button" class="pref-card" onclick="togglePref(this)" data-preference="2">
+          <div class="pref-card-inner">
+            <img class="pref-card-icon" src="https://cloudfront.frive.co.uk/media/7046/muscle_(1).svg" alt="High Protein Meals">
+            <span class="pref-card-label">High Protein Meals</span>
+          </div>
+        </button>
+        <button type="button" class="pref-card" onclick="togglePref(this)" data-preference="3">
+          <div class="pref-card-inner">
+            <img class="pref-card-icon" src="https://cloudfront.frive.co.uk/media/7053/icon_(4).svg" alt="Calorie Conscious">
+            <span class="pref-card-label">Calorie Conscious</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</form>
+
+<!-- ── Sticky Next / See All Meals button ── -->
+<div class="sticky-btn-wrap">
+  <button class="button-primary" id="mainBtn" type="button" onclick="handleMainBtn()">
+    <span id="mainBtnContent">Next</span>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+  let currentStep = 1;
+  let maxStepReached = 1; // Track the highest step the user has reached
+  const state = { goals: [], servings: 1, meals: 2, breakfastIncluded: false, days: 4, allergens: [], ingredients: [], preferences: [] };
+  let breakfastItems = []; // Store fetched breakfast items
+
+  // ── Session Storage Functions ───────────
+  function saveState() {
+    sessionStorage.setItem('orderFlowState', JSON.stringify(state));
+    sessionStorage.setItem('currentStep', currentStep.toString());
+    sessionStorage.setItem('maxStepReached', maxStepReached.toString());
+  }
+
+  function loadState() {
+    const savedState = sessionStorage.getItem('orderFlowState');
+    const savedStep = sessionStorage.getItem('currentStep');
+    const savedMaxStep = sessionStorage.getItem('maxStepReached');
+    
+    if (savedState) {
+      Object.assign(state, JSON.parse(savedState));
+      restoreUIFromState();
+    }
+    
+    if (savedStep) {
+      currentStep = parseInt(savedStep);
+    }
+    
+    if (savedMaxStep) {
+      maxStepReached = parseInt(savedMaxStep);
+    }
+    
+    // Check URL for step parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const stepParam = urlParams.get('step');
+    if (stepParam) {
+      const step = parseInt(stepParam);
+      if (step >= 1 && step <= 6) {
+        currentStep = step;
+        if (step > maxStepReached) {
+          maxStepReached = step;
+        }
+      }
+    }
+    
+    // Show the current step
+    if (currentStep !== 1) {
+      showStep(currentStep);
+    }
+  }
+
+  function restoreUIFromState() {
+    // Restore goals
+    if (state.goals.length > 0) {
+      document.querySelectorAll('.goal-card').forEach(card => {
+        const goalName = card.getAttribute('data-goal');
+        if (state.goals.includes(goalName)) {
+          card.classList.add('selected');
+          // Show the banner
+          const goalIcon = card.getAttribute('data-icon');
+          const goalMessage = card.getAttribute('data-message');
+          const banner = document.getElementById('goalBanner');
+          const bannerIcon = document.getElementById('goalBannerIcon');
+          const bannerText = document.getElementById('goalBannerText');
+          if (banner && bannerIcon && bannerText) {
+            bannerIcon.src = goalIcon;
+            bannerText.textContent = goalMessage;
+            banner.style.display = 'flex';
+          }
+        }
+      });
+    }
+    
+    // Restore servings
+    document.querySelectorAll('#step-2 .serving-card').forEach(card => {
+      if (parseInt(card.dataset.value) === state.servings) {
+        card.classList.add('selected');
+      }
+    });
+    
+    // Restore meals
+    document.querySelectorAll('#step-3 .meal-card').forEach(card => {
+      if (parseInt(card.dataset.value) === state.meals) {
+        card.classList.add('selected');
+      }
+    });
+    
+    // Restore breakfast checkbox
+    if (state.breakfastIncluded) {
+      document.getElementById('bfastBox').classList.add('checked');
+      if (breakfastItems.length > 0) {
+        document.getElementById('breakfastShowcaseWrapper').style.display = 'block';
+      }
+    }
+    
+    // Restore days
+    document.querySelectorAll('#step-4 .day-card').forEach(card => {
+      if (parseInt(card.dataset.value) === state.days) {
+        card.classList.add('selected');
+      }
+    });
+    
+    // Restore allergens
+    if (state.allergens.length > 0) {
+      document.querySelectorAll('.allergy-pill').forEach(pill => {
+        if (state.allergens.includes(pill.textContent.trim())) {
+          pill.classList.add('selected');
+        }
+      });
+    }
+    
+    // Restore ingredients
+    if (state.ingredients.length > 0) {
+      updateCMSPlaceholder();
+    }
+    
+    // Restore preferences
+    if (state.preferences && state.preferences.length > 0) {
+      document.querySelectorAll('.pref-card').forEach(card => {
+        const prefId = parseInt(card.dataset.preference);
+        if (state.preferences.includes(prefId)) {
+          card.classList.add('selected');
+        }
+      });
+    }
+  }
+
+  function updateURLStep(step) {
+    const url = new URL(window.location);
+    url.searchParams.set('step', step);
+    window.history.pushState({}, '', url);
+  }
+
+  // ── Fetch Breakfast Items from API ──────
+  async function fetchBreakfastItems() {
+    try {
+      const response = await fetch('https://www.frive.co.uk/api/klaviyo/product-catalog');
+      const products = await response.json();
+      
+      // Get current date
+      const today = new Date();
+      
+      // Filter breakfast items and find closest menu date
+      const breakfasts = products.filter(item => 
+        item.categories && item.categories.includes('Breakfast')
+      );
+      
+      // Sort by menu date (closest to today)
+      breakfasts.sort((a, b) => {
+        const dateA = new Date(a.$menu_date);
+        const dateB = new Date(b.$menu_date);
+        const diffA = Math.abs(dateA - today);
+        const diffB = Math.abs(dateB - today);
+        return diffA - diffB;
+      });
+      
+      // Get first 3 breakfast items
+      breakfastItems = breakfasts.slice(0, 3);
+      
+      // Render breakfast cards if we have items
+      if (breakfastItems.length > 0) {
+        renderBreakfastCards();
+      } else {
+        // Hide the showcase wrapper if no items
+        document.getElementById('breakfastShowcaseWrapper').style.display = 'none';
+      }
+      
+    } catch (error) {
+      console.error('Error fetching breakfast items:', error);
+      // Hide the showcase wrapper on error
+      const wrapper = document.getElementById('breakfastShowcaseWrapper');
+      if (wrapper) {
+        wrapper.style.display = 'none';
+      }
+    }
+  }
+
+  // ── Render Breakfast Cards ──────────────
+  function renderBreakfastCards() {
+    const container = document.getElementById('breakfastShowcase');
+    
+    if (breakfastItems.length === 0) {
+      return;
+    }
+    
+    container.innerHTML = breakfastItems.map(item => `
+      <div class="breakfast-card">
+        <img src="${item.$image_link}" alt="${item.$title}" class="breakfast-card-img" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+        <div class="breakfast-card-content">
+          <h4 class="breakfast-card-title">${item.$title}</h4>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Load saved state on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    loadState();
+  });
+
+  // ── Build newOrderFlowModel ─────────────
+  function buildNewOrderFlowModel() {
+    console.log('========== buildNewOrderFlowModel START ==========');
+    
+    // Helper: ISO date string
+    function isoDate(d) {
+      const pad = n => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    }
+    
+    // Helper: default next delivery date (3 days from now)
+    function defaultNextDeliveryDate() {
+      const d = new Date();
+      d.setDate(d.getDate() + 3);
+      return d;
+    }
+    
+    // Helper: get day of week number (0-6)
+    function buildDeliveryDayNumber(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.getDay();
+    }
+    
+    const futureTimestamp = Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60);
+    
+    // Get selected preferences from state
+    const selectedPreferences = state.preferences || [];
+    
+    console.log('[buildNewOrderFlowModel] selectedPreferences:', selectedPreferences);
+    
+    const numberOfBreakfasts = state.breakfastIncluded ? 1 : 0;
+    const numberOfMeals = Math.max(0, state.meals - numberOfBreakfasts);
+    
+    // Total meals / breakfasts per week (all portions)
+    const totalMealsPerWeek = state.meals * state.servings * state.days;
+    const totalBreakfastsPerWeek = numberOfBreakfasts * state.servings * state.days;
+    
+    console.log('[buildNewOrderFlowModel] meal breakdown:', {
+      meals: state.meals,
+      servings: state.servings,
+      days: state.days,
+      breakfastIncluded: state.breakfastIncluded,
+      numberOfBreakfasts: numberOfBreakfasts,
+      numberOfMeals: numberOfMeals,
+      totalMealsPerWeek: totalMealsPerWeek,
+      totalBreakfastsPerWeek: totalBreakfastsPerWeek
+    });
+    
+    // Build items array: {box, day, menu_id, number, type}
+    const items = [];
+    let itemNumber = 0;
+    
+    for (let day = 1; day <= state.days; day++) {
+      for (let person = 0; person < state.servings; person++) {
+        for (let mealInDay = 0; mealInDay < state.meals; mealInDay++) {
+          const isBreakfast = state.breakfastIncluded && (mealInDay === 0);
+          items.push({
+            box: 1,
+            day: day,
+            menu_id: null,
+            number: itemNumber,
+            type: isBreakfast ? 11 : 10  // 11 = breakfast, 10 = main meal
+          });
+          itemNumber++;
+        }
+      }
+    }
+    
+    console.log('[buildNewOrderFlowModel] generated items:', items.length);
+    
+    const chosenDate = defaultNextDeliveryDate();
+    const nextDateStr = isoDate(chosenDate);
+    const deliveryDay = buildDeliveryDayNumber(nextDateStr);
+    
+    // Get coupon from localStorage
+    let couponCode = null;
+    try {
+      const c1 = localStorage.getItem('coupon') || '';
+      const c2 = localStorage.getItem('couponCode') || '';
+      const c3 = localStorage.getItem('discountCode') || '';
+      couponCode = (c1 || c2 || c3).trim() || null;
+    } catch (err) {
+      console.error('[buildNewOrderFlowModel] Error reading coupon:', err);
+    }
+    
+    // Check if model already exists
+    let existingModel = null;
+    try {
+      const saved = localStorage.getItem('newOrderFlowModel');
+      if (saved) {
+        existingModel = JSON.parse(saved);
+        console.log('[buildNewOrderFlowModel] Found existing model');
+      }
+    } catch (err) {
+      console.error('[buildNewOrderFlowModel] Error reading existing model:', err);
+    }
+    
+    // Build or update the model
+    const newOrderFlowModel = {
+      // Core settings
+      delivery_count: 1,
+      delivery_day: deliveryDay,
+      delivery_days: [deliveryDay],
+      early_delivery_days: [],
+      exclusions: state.allergens || [],
+      items: items,
+      next_delivery_date: nextDateStr,
+      nextDeliveryDateSelection: nextDateStr,
+      secondDeliveryDateSelection: '0',
+      num_days: state.days,
+      numDaysSelection: state.days,
+      number_of_breakfasts: numberOfBreakfasts,
+      number_of_meals: numberOfMeals,
+      number_of_snacks: 0,
+      number_of_servings: state.servings,
+      selectedBreakfasts: numberOfBreakfasts,
+      selectedMeals: state.meals,
+      selectedSnacks: 0,
+      
+      // Preferences & goals
+      preferences: selectedPreferences,
+      goals: state.goals || [],
+      
+      // Allergens
+      hasAllergies: state.allergens.length > 0 ? '1' : '0',
+      allergies: state.allergens.length > 0 ? state.allergens.join(', ') : null,
+      allergiesComplete: true,
+      
+      // Ingredients
+      cms_avoid: state.ingredients || [],
+      
+      // Feature flags
+      coupon: couponCode,
+      multiproteins_enabled: null,
+      goals_question_enabled: true,
+      weekly_generated_plans_enabled: false,
+      new_summary_enabled: true,
+      two_box_upsell_enabled: false,
+      one_box_days_of_week: true,
+      one_box_plan_recommendation: false,
+      one_box_delivery: true,
+      isOneBoxDelivery: true,
+      
+      // Status flags
+      daysChanged: false,
+      has_out_of_stock: false,
+      has_out_of_stock_next: false,
+      itemsChanged: false,
+      hasBreakfasts: state.breakfastIncluded,
+      mealsSelected: true,
+      
+      // Totals
+      total_meals_per_week: totalMealsPerWeek,
+      total_breakfasts_per_week: totalBreakfastsPerWeek,
+      
+      // Metadata
+      meal_id: 13,
+      expires: futureTimestamp
+    };
+    
+    // If updating existing model, preserve certain fields
+    if (existingModel) {
+      console.log('[buildNewOrderFlowModel] Updating existing model');
+      // Preserve selected menu_ids if they exist
+      if (existingModel.items && existingModel.items.length === newOrderFlowModel.items.length) {
+        newOrderFlowModel.items = newOrderFlowModel.items.map((item, idx) => ({
+          ...item,
+          menu_id: existingModel.items[idx]?.menu_id || null
+        }));
+      }
+    }
+    
+    console.log('[buildNewOrderFlowModel] Final model:', newOrderFlowModel);
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('newOrderFlowModel', JSON.stringify(newOrderFlowModel));
+      localStorage.setItem('newOrderStep', '7');
+      localStorage.setItem('newOrderBack', '/order-flow');
+      console.log('[buildNewOrderFlowModel] Saved to localStorage');
+    } catch (err) {
+      console.error('[buildNewOrderFlowModel] Error saving to localStorage:', err);
+    }
+    
+    return newOrderFlowModel;
+  }
+
+  // ── Navigation ──────────────────────────
+  function showStep(n) {
+    const currentPanel = document.querySelector('.step-panel.active');
+    const nextPanel = document.getElementById('step-' + n);
+    
+    // Update max step reached
+    if (n > maxStepReached) {
+      maxStepReached = n;
+    }
+    
+    // Add exiting animation to current panel
+    if (currentPanel && currentPanel !== nextPanel) {
+      currentPanel.classList.add('exiting');
+      currentPanel.classList.remove('active');
+      
+      // Wait for exit animation to complete before showing next panel
+      setTimeout(() => {
+        currentPanel.classList.remove('exiting');
+        nextPanel.classList.add('active');
+      }, 400); // Match the animation duration
+    } else {
+      nextPanel.classList.add('active');
+    }
+    
+    // Update step button states
+    document.querySelectorAll('.order-flow-button').forEach((btn, i) => {
+      const stepNum = i + 1;
+      btn.classList.remove('active', 'completed');
+      
+      if (stepNum === n) {
+        btn.classList.add('active');
+      } else if (stepNum < n) {
+        btn.classList.add('completed');
+      }
+    });
+    
+    // Update continuous progress line
+    const progressPercent = ((n - 1) / 5) * 100; // 5 gaps between 6 steps
+    const stepNavWrapper = document.querySelector('.step-nav-wrapper');
+    stepNavWrapper.style.setProperty('--progress', progressPercent + '%');
+    
+    document.getElementById('backBtn').classList.toggle('visible', n > 1);
+
+    // Info bar: steps 1-2 = voucher, steps 3+ = calories
+    const showVoucher = n <= 2;
+    document.getElementById('barVoucher').style.display = showVoucher ? 'block' : 'none';
+    document.getElementById('barCalories').style.display = showVoucher ? 'none' : 'block';
+
+    // Button label
+    const btn = document.getElementById('mainBtnContent');
+    if (n === 6) {
+      btn.textContent = 'See My Meals';
+    } else {
+      btn.textContent = 'Next';
+    }
+
+    // Reset allergen gatekeeper when returning to step 5
+    if (n === 5) {
+      document.getElementById('allergenGatekeeper').style.display = 'block';
+      document.getElementById('allergenContent').style.display = 'none';
+      document.querySelectorAll('.gatekeeper-btn').forEach(btn => btn.classList.remove('selected'));
+    }
+
+    // Allergen notice on step 6
+    if (n === 6) updateAllergenNotice();
+
+    currentStep = n;
+    updateURLStep(n);
+    saveState();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goToStep(n) { 
+    // Allow going to any step that has been reached or is earlier
+    if (n <= maxStepReached) showStep(n); 
+  }
+  function goBack() { if (currentStep > 1) showStep(currentStep - 1); }
+
+  function handleMainBtn() {
+    if (currentStep < 6) {
+      showStep(currentStep + 1);
+    } else {
+      // On final step, build the model and redirect to summary
+      console.log('[handleMainBtn] Building newOrderFlowModel and redirecting...');
+      buildNewOrderFlowModel();
+      window.location.href = 'summary.html';
+    }
+  }
+
+  // ── Step 1: Goals ───────────────────────
+  function toggleGoal(el) {
+    const isSelected = el.classList.contains('selected');
+    
+    // If clicking already selected goal, deselect it
+    if (isSelected) {
+      el.classList.remove('selected');
+      state.goals = [];
+      // Hide banner
+      document.getElementById('goalBanner').style.display = 'none';
+      return;
+    }
+    
+    // Deselect all other goals (only allow one selection)
+    document.querySelectorAll('.goal-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    
+    // Select the clicked goal
+    el.classList.add('selected');
+    const goalName = el.getAttribute('data-goal');
+    const goalIcon = el.getAttribute('data-icon');
+    const goalMessage = el.getAttribute('data-message');
+    state.goals = [goalName];
+    
+    // Show and update banner
+    const banner = document.getElementById('goalBanner');
+    const bannerIcon = document.getElementById('goalBannerIcon');
+    const bannerText = document.getElementById('goalBannerText');
+    
+    bannerIcon.src = goalIcon;
+    bannerText.textContent = goalMessage;
+    banner.style.display = 'flex';
+    
+    saveState();
+  }
+
+  // ── Generic radio select ─────────────────
+  function selectRadio(el, selector) {
+    document.querySelectorAll(selector).forEach(l => l.classList.remove('selected'));
+    el.classList.add('selected');
+    
+    // Update state based on which step
+    const value = parseInt(el.dataset.value);
+    if (selector.includes('serving-card')) {
+      state.servings = value;
+    } else if (selector.includes('meal-card')) {
+      state.meals = value;
+    } else if (selector.includes('day-card')) {
+      state.days = value;
+    }
+    
+    saveState();
+  }
+
+  // ── Step 3: Breakfast ───────────────────
+  function toggleBreakfast(el) {
+    state.breakfastIncluded = !state.breakfastIncluded;
+    document.getElementById('bfastBox').classList.toggle('checked', state.breakfastIncluded);
+    
+    // Show/hide breakfast showcase with fade animation (only if items are loaded)
+    const showcaseWrapper = document.getElementById('breakfastShowcaseWrapper');
+    if (state.breakfastIncluded && breakfastItems.length > 0) {
+      showcaseWrapper.style.display = 'block';
+    } else {
+      showcaseWrapper.style.display = 'none';
+    }
+    
+    saveState();
+  }
+
+  // ── Step 5: Allergen Gatekeeper ─────────
+  function answerAllergenQuestion(answer) {
+    const gatekeeperSection = document.getElementById('allergenGatekeeper');
+    const allergenContent = document.getElementById('allergenContent');
+    const buttons = document.querySelectorAll('.gatekeeper-btn');
+    
+    // Update button states
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    event.target.classList.add('selected');
+    
+    if (answer === 'yes') {
+      // Show allergen/ingredient selection
+      setTimeout(() => {
+        gatekeeperSection.style.display = 'none';
+        allergenContent.style.display = 'block';
+      }, 300);
+    } else {
+      // Skip to next step
+      setTimeout(() => {
+        showStep(currentStep + 1);
+      }, 300);
+    }
+  }
+
+  // ── Step 5: Allergens ───────────────────
+  function toggleAllergen(el) {
+    el.classList.toggle('selected');
+    const text = el.textContent.trim();
+    if (el.classList.contains('selected')) state.allergens.push(text);
+    else state.allergens = state.allergens.filter(a => a !== text);
+    saveState();
+  }
+
+  function toggleCMS() {
+    const dd = document.getElementById('cmsDropdown');
+    const arrow = document.getElementById('cmsArrow');
+    dd.classList.toggle('open');
+    arrow.style.transform = dd.classList.contains('open')
+      ? 'translateY(-50%) rotate(180deg)'
+      : 'translateY(-50%)';
+  }
+
+  function selectIngredient(el) {
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      state.ingredients = state.ingredients.filter(i => i !== el.textContent);
+    } else {
+      if (state.ingredients.length >= 3) return;
+      el.classList.add('selected');
+      state.ingredients.push(el.textContent.trim());
+    }
+    const placeholder = document.getElementById('cmsPlaceholder');
+    placeholder.textContent = state.ingredients.length ? state.ingredients.join(', ') : 'Select items';
+    saveState();
+  }
+
+  // ── Step 6: Preferences ─────────────────
+  function togglePref(el) { 
+    el.classList.toggle('selected');
+    const prefId = parseInt(el.dataset.preference);
+    
+    if (el.classList.contains('selected')) {
+      // Add to preferences array if not already there
+      if (!state.preferences.includes(prefId)) {
+        state.preferences.push(prefId);
+      }
+    } else {
+      // Remove from preferences array
+      state.preferences = state.preferences.filter(p => p !== prefId);
+    }
+    
+    saveState();
+  }
+
+  function updateAllergenNotice() {
+    const notice = document.getElementById('allergenNotice');
+    const text = document.getElementById('allergenNoticeText');
+    if (state.allergens.length > 0) {
+      notice.classList.add('visible');
+      text.textContent = 'Your allergens: ' + state.allergens.join(', ');
+    } else {
+      notice.classList.remove('visible');
+    }
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('cmsDropdown');
+    if (dd && !e.target.closest('.custom-multiselect')) {
+      dd.classList.remove('open');
+      document.getElementById('cmsArrow').style.transform = 'translateY(-50%)';
+    }
+  });
+
+  // Load saved state on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    loadState();
+  });
+
+  // Init
+  showStep(1);
+</script>
+

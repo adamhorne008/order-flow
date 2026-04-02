@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frive Order Flow - Testing Hub</title>
+  <style>
+    @font-face {
+      font-family: 'FriveJokker';
+      src: url('fonts/FriveJokker-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'FriveJokker';
+      src: url('fonts/FriveJokker-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'FriveJokker';
+      src: url('fonts/FriveJokker-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    :root {
+      --kale: #053827;
+      --lime: #C6F432;
+      --cream-banner: #FFF7E8;
+      --border: #E0E0E0;
+      --grey-60: #666;
+      --grey-80: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'FriveJokker', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      padding: 40px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid var(--lime);
+    }
+
+    .header h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      color: var(--kale);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 16px;
+      color: var(--grey-60);
+      margin-bottom: 8px;
+    }
+
+    .version-badge {
+      display: inline-block;
+      background: var(--lime);
+      color: var(--kale);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .flows-section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--grey-80);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: var(--lime);
+      border-radius: 2px;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .flow-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-decoration: none;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .flow-card:hover {
+      border-color: var(--kale);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(5, 56, 39, 0.15);
+    }
+
+    .flow-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .flow-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--lime);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .flow-card h3 {
+      font-size: 18px;
+      color: var(--kale);
+      font-weight: 700;
+    }
+
+    .flow-card p {
+      font-size: 14px;
+      color: var(--grey-60);
+      line-height: 1.5;
+    }
+
+    .flow-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .status-main {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status-testing {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .status-debug {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .utilities {
+      background: var(--cream-banner);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    .utilities h4 {
+      font-size: 16px;
+      color: var(--grey-80);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .utility-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .utility-btn {
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      color: var(--grey-80);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-family: 'FriveJokker', Arial, sans-serif;
+    }
+
+    .utility-btn:hover {
+      border-color: var(--kale);
+      background: var(--kale);
+      color: white;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--grey-60);
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 24px;
+      }
+      
+      .flow-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🥗 Frive Order Flow</h1>
+      <p>Testing & Development Hub</p>
+      <span class="version-badge">v2.0 - April 2026</span>
+    </div>
+
+    <div class="flows-section">
+      <h2 class="section-title">Order Flow Versions</h2>
+      
+      <div class="flow-grid">
+        <a href="order-flow.html" class="flow-card">
+          <div class="flow-card-header">
+            <div class="flow-icon">🎯</div>
+            <h3>Main Flow</h3>
+          </div>
+          <p>Current production version with all latest features and refinements.</p>
+          <span class="flow-status status-main">✓ Production Ready</span>
+        </a>
+
+        <a href="order-flow-v2.html" class="flow-card">
+          <div class="flow-card-header">
+            <div class="flow-icon">🧪</div>
+            <h3>Experimental Flow</h3>
+          </div>
+          <p>Test new features and variations. Safe to break things here!</p>
+          <span class="flow-status status-testing">⚡ Testing Version</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="flows-section">
+      <h2 class="section-title">Debug & Tools</h2>
+      
+      <div class="flow-grid">
+        <a href="summary.html" class="flow-card">
+          <div class="flow-card-header">
+            <div class="flow-icon">📊</div>
+            <h3>Data Summary</h3>
+          </div>
+          <p>View complete data layer structure and all selected values in table format.</p>
+          <span class="flow-status status-debug">Debug Tool</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="utilities">
+      <h4>🛠️ Quick Actions</h4>
+      <div class="utility-buttons">
+        <button class="utility-btn" onclick="clearAllData()">Clear All Data</button>
+        <button class="utility-btn" onclick="viewStoredData()">View Stored Data</button>
+        <a href="order-flow.html?step=1" class="utility-btn">Start Fresh Flow</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Built with ❤️ for Frive | Last updated: April 2026</p>
+    </div>
+  </div>
+
+  <script>
+    function clearAllData() {
+      if (confirm('This will clear all sessionStorage and localStorage data. Continue?')) {
+        sessionStorage.clear();
+        localStorage.clear();
+        alert('✓ All data cleared successfully!');
+      }
+    }
+
+    function viewStoredData() {
+      const state = sessionStorage.getItem('orderFlowState');
+      const model = localStorage.getItem('newOrderFlowModel');
+      
+      let message = '📦 STORED DATA:\n\n';
+      
+      if (state) {
+        message += '✓ Session State Found\n';
+        message += JSON.stringify(JSON.parse(state), null, 2);
+      } else {
+        message += '✗ No session state\n';
+      }
+      
+      message += '\n\n';
+      
+      if (model) {
+        message += '✓ Order Flow Model Found\n';
+        const data = JSON.parse(model);
+        message += `Items: ${data.items?.length || 0}\n`;
+        message += `Preferences: ${data.preferences?.length || 0}\n`;
+      } else {
+        message += '✗ No order flow model\n';
+      }
+      
+      alert(message);
+    }
+  </script>
+</body>
+</html>

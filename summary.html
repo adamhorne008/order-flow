@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Summary - Frive</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #fffdf8;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #053827;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+    
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .section h2 {
+      color: #053827;
+      margin-bottom: 16px;
+      font-size: 20px;
+      border-bottom: 2px solid #c6fa5f;
+      padding-bottom: 8px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #053827;
+    }
+    
+    tr:hover {
+      background: #fafafa;
+    }
+    
+    .highlight {
+      background: #c6fa5f;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+    
+    .badge-breakfast {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .badge-meal {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .badge-yes {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .badge-no {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+    
+    .stat-card {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid #c6fa5f;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #053827;
+    }
+    
+    .json-view {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .json-view pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid #f5c6cb;
+    }
+    
+    .button {
+      background: #053827;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 12px;
+      margin-bottom: 12px;
+      transition: background 0.2s;
+    }
+    
+    .button:hover {
+      background: #074530;
+    }
+    
+    .button-secondary {
+      background: white;
+      color: #053827;
+      border: 2px solid #053827;
+    }
+    
+    .button-secondary:hover {
+      background: #f8f9fa;
+    }
+    
+    .actions {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Order Summary</h1>
+    <p class="subtitle">Review your order configuration and data layer</p>
+    
+    <div class="actions">
+      <button class="button" onclick="window.location.href='order-flow.html'">← Back to Order Flow</button>
+      <button class="button button-secondary" onclick="clearData()">Clear Data</button>
+      <button class="button button-secondary" onclick="location.reload()">Refresh</button>
+    </div>
+    
+    <div id="content">
+      <div class="error">
+        <strong>No Data Found</strong><br>
+        Please complete the order flow first.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function clearData() {
+      if (confirm('Are you sure you want to clear all order data?')) {
+        localStorage.removeItem('newOrderFlowModel');
+        localStorage.removeItem('newOrderStep');
+        localStorage.removeItem('newOrderBack');
+        sessionStorage.clear();
+        location.reload();
+      }
+    }
+    
+    function formatValue(value) {
+      if (value === null) return '<em style="color: #999;">null</em>';
+      if (value === undefined) return '<em style="color: #999;">undefined</em>';
+      if (value === '') return '<em style="color: #999;">empty string</em>';
+      if (typeof value === 'boolean') return value ? '✓ Yes' : '✗ No';
+      if (Array.isArray(value)) {
+        if (value.length === 0) return '<em style="color: #999;">empty array</em>';
+        return value.join(', ');
+      }
+      return value;
+    }
+    
+    function getPreferenceName(id) {
+      const names = {
+        1: 'Frive Favourites',
+        2: 'High Protein Meals',
+        3: 'Calorie Conscious',
+        4: 'Meat',
+        5: 'Fish',
+        6: 'Vegan & Vegetarian'
+      };
+      return names[id] || `Preference ${id}`;
+    }
+    
+    function displaySummary() {
+      const savedModel = localStorage.getItem('newOrderFlowModel');
+      
+      if (!savedModel) {
+        return; // Error message already displayed
+      }
+      
+      try {
+        const model = JSON.parse(savedModel);
+        
+        let html = '';
+        
+        // Key Statistics
+        html += `
+          <div class="section">
+            <h2>📊 Key Statistics</h2>
+            <div class="grid">
+              <div class="stat-card">
+                <div class="stat-label">People</div>
+                <div class="stat-value">${model.number_of_servings}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Meals per Day</div>
+                <div class="stat-value">${model.selectedMeals}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Days per Week</div>
+                <div class="stat-value">${model.num_days}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Total Items/Week</div>
+                <div class="stat-value">${model.total_meals_per_week}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Main Meals</div>
+                <div class="stat-value">${model.number_of_meals}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Breakfasts</div>
+                <div class="stat-value">${model.number_of_breakfasts}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Delivery Information
+        html += `
+          <div class="section">
+            <h2>🚚 Delivery Information</h2>
+            <table>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Next Delivery Date</td>
+                <td><span class="highlight">${model.next_delivery_date}</span></td>
+              </tr>
+              <tr>
+                <td>Delivery Day</td>
+                <td>${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][model.delivery_day]}</td>
+              </tr>
+              <tr>
+                <td>Delivery Count</td>
+                <td>${model.delivery_count}</td>
+              </tr>
+              <tr>
+                <td>Is One Box Delivery</td>
+                <td>${model.isOneBoxDelivery ? '✓ Yes' : '✗ No'}</td>
+              </tr>
+            </table>
+          </div>
+        `;
+        
+        // Goals & Preferences
+        html += `
+          <div class="section">
+            <h2>🎯 Goals & Preferences</h2>
+            <table>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Goals</td>
+                <td>${model.goals && model.goals.length > 0 ? model.goals.map(g => `<span class="badge badge-meal">${g}</span>`).join('') : '<em style="color: #999;">None selected</em>'}</td>
+              </tr>
+              <tr>
+                <td>Preferences</td>
+                <td>${model.preferences && model.preferences.length > 0 ? model.preferences.map(p => `<span class="badge badge-meal">${getPreferenceName(p)} (${p})</span>`).join('') : '<em style="color: #999;">None selected</em>'}</td>
+              </tr>
+              <tr>
+                <td>Include Breakfast</td>
+                <td>${model.hasBreakfasts ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
+              </tr>
+            </table>
+          </div>
+        `;
+        
+        // Allergens & Exclusions
+        html += `
+          <div class="section">
+            <h2>⚠️ Allergens & Exclusions</h2>
+            <table>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Has Allergies</td>
+                <td>${model.hasAllergies === '1' ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
+              </tr>
+              <tr>
+                <td>Allergen Exclusions</td>
+                <td>${model.exclusions && model.exclusions.length > 0 ? model.exclusions.map(a => `<span class="badge badge-meal">${a}</span>`).join('') : '<em style="color: #999;">None</em>'}</td>
+              </tr>
+              <tr>
+                <td>Allergies (String)</td>
+                <td>${model.allergies || '<em style="color: #999;">None</em>'}</td>
+              </tr>
+              <tr>
+                <td>Ingredients to Avoid</td>
+                <td>${model.cms_avoid && model.cms_avoid.length > 0 ? model.cms_avoid.map(i => `<span class="badge badge-meal">${i}</span>`).join('') : '<em style="color: #999;">None</em>'}</td>
+              </tr>
+            </table>
+          </div>
+        `;
+        
+        // Items Array
+        html += `
+          <div class="section">
+            <h2>📦 Items (${model.items.length} total)</h2>
+            <table>
+              <tr>
+                <th>#</th>
+                <th>Box</th>
+                <th>Day</th>
+                <th>Type</th>
+                <th>Menu ID</th>
+              </tr>
+              ${model.items.map((item, idx) => `
+                <tr>
+                  <td>${idx + 1}</td>
+                  <td>${item.box}</td>
+                  <td>Day ${item.day}</td>
+                  <td>
+                    ${item.type === 11 
+                      ? '<span class="badge badge-breakfast">Breakfast</span>' 
+                      : '<span class="badge badge-meal">Main Meal</span>'}
+                  </td>
+                  <td>${item.menu_id || '<em style="color: #999;">Not selected</em>'}</td>
+                </tr>
+              `).join('')}
+            </table>
+          </div>
+        `;
+        
+        // Feature Flags
+        html += `
+          <div class="section">
+            <h2>🚩 Feature Flags</h2>
+            <table>
+              <tr>
+                <th>Flag</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Goals Question Enabled</td>
+                <td>${model.goals_question_enabled ? '✓' : '✗'}</td>
+              </tr>
+              <tr>
+                <td>New Summary Enabled</td>
+                <td>${model.new_summary_enabled ? '✓' : '✗'}</td>
+              </tr>
+              <tr>
+                <td>One Box Days of Week</td>
+                <td>${model.one_box_days_of_week ? '✓' : '✗'}</td>
+              </tr>
+              <tr>
+                <td>Weekly Generated Plans</td>
+                <td>${model.weekly_generated_plans_enabled ? '✓' : '✗'}</td>
+              </tr>
+              <tr>
+                <td>Two Box Upsell</td>
+                <td>${model.two_box_upsell_enabled ? '✓' : '✗'}</td>
+              </tr>
+            </table>
+          </div>
+        `;
+        
+        // Other Data
+        html += `
+          <div class="section">
+            <h2>📋 Additional Data</h2>
+            <table>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Coupon Code</td>
+                <td>${model.coupon || '<em style="color: #999;">None</em>'}</td>
+              </tr>
+              <tr>
+                <td>Meal ID</td>
+                <td>${model.meal_id}</td>
+              </tr>
+              <tr>
+                <td>Expires (Timestamp)</td>
+                <td>${model.expires} <em style="color: #999;">(${new Date(model.expires * 1000).toLocaleString()})</em></td>
+              </tr>
+              <tr>
+                <td>Days Changed</td>
+                <td>${model.daysChanged ? '✓' : '✗'}</td>
+              </tr>
+              <tr>
+                <td>Items Changed</td>
+                <td>${model.itemsChanged ? '✓' : '✗'}</td>
+              </tr>
+              <tr>
+                <td>Has Out of Stock</td>
+                <td>${model.has_out_of_stock ? '✓' : '✗'}</td>
+              </tr>
+            </table>
+          </div>
+        `;
+        
+        // Raw JSON
+        html += `
+          <div class="section">
+            <h2>💾 Raw JSON Data</h2>
+            <div class="json-view">
+              <pre>${JSON.stringify(model, null, 2)}</pre>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('content').innerHTML = html;
+        
+      } catch (error) {
+        document.getElementById('content').innerHTML = `
+          <div class="error">
+            <strong>Error Parsing Data</strong><br>
+            ${error.message}<br><br>
+            <pre style="margin-top: 12px; font-size: 12px;">${savedModel}</pre>
+          </div>
+        `;
+      }
+    }
+    
+    // Load data on page load
+    displaySummary();
+  </script>
+</body>
+</html>
