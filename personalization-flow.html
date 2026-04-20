@@ -887,7 +887,7 @@
     </div>
   </header>
 
-  <div class="info-bar-wrap">
+  <div class="info-bar-wrap" id="info-bar-wrap">
     <div class="info-bar">
       💰 Rate 10 meals to claim your £5 credit!
     </div>
@@ -1039,14 +1039,14 @@
       <!-- Success Banner -->
       <div class="success-banner">
         <h2>🎉 £5 credit added to your account!</h2>
-        <p>Your credit will be automatically applied to your next order. Welcome to Frive!</p>
+        <p>Your credit will be automatically applied to your next payment.</p>
       </div>
 
       <!-- Benefits Section -->
       <div class="benefits-container">
         <div class="benefits-header">
-          <h3>Welcome to the Frive Family</h3>
-          <p>Here's everything you need to know to make the most of your membership</p>
+          <h3>Welcome to the Frive!</h3>
+          <p>Here's everything you need to know to make the most of your subscription</p>
         </div>
 
         <div class="benefits-grid">
@@ -1059,7 +1059,7 @@
             <p style="font-size: 13px; font-style: italic; color: var(--grey-60); margin-bottom: 4px;">"Where is my delivery?"</p>
             <p style="font-size: 13px; font-style: italic; color: var(--grey-60); margin-bottom: 16px;">"I would like to change my meals"</p>
             <a href="https://wa.me/447957621162" target="_blank" class="btn whatsapp">
-              💚 Chat on WhatsApp
+              💚 Save Whatsapp Number
             </a>
           </div>
 
@@ -1085,18 +1085,6 @@
           </div>
         </div>
 
-        <!-- Additional Info -->
-        <div class="benefit-card" style="max-width: 100%; text-align: left;">
-          <h4 style="text-align: center; margin-bottom: 20px;">💡 Quick Tips</h4>
-          <p><strong>📦 Track your delivery:</strong> Check your order status anytime</p>
-          <p><strong>🍽️ Customize your menu:</strong> Change meals up to 3 days before delivery</p>
-          <p><strong>⏸️ Pause anytime:</strong> Manage your subscription easily in your account</p>
-          <p style="margin-bottom: 0; text-align: center; margin-top: 24px;">
-            <a href="https://www.frive.co.uk/my-account" class="btn">
-              Go to My Account →
-            </a>
-          </p>
-        </div>
       </div>
     </div>
   </div>
@@ -1477,6 +1465,7 @@
       
       // Restore success state
       if (state.creditClaimed) {
+        document.getElementById('info-bar-wrap').style.display = 'none';
         document.getElementById('intro-screen').style.display = 'none';
         document.getElementById('preferences-section').style.display = 'none';
         document.getElementById('split-box-section').style.display = 'none';
@@ -1701,6 +1690,7 @@
       await markCreditClaimed();
       
       // Hide all other sections
+      document.getElementById('info-bar-wrap').style.display = 'none';
       document.getElementById('intro-screen').style.display = 'none';
       document.getElementById('preferences-section').style.display = 'none';
       document.getElementById('split-box-section').style.display = 'none';
