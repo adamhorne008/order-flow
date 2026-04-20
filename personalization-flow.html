@@ -615,37 +615,226 @@
       border-color: #F44336;
     }
 
+    /* Split Box Section */
+    .split-box-section {
+      display: none;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 40px 24px;
+    }
+
+    .split-box-section .section-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .split-box-section h2 {
+      font-size: clamp(24px, 4vw, 32px);
+      color: var(--grey-80);
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .split-box-section p {
+      font-size: 16px;
+      color: var(--grey-60);
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .split-box-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .split-box-card {
+      background: white;
+      border: 3px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .split-box-card:hover {
+      border-color: var(--kale);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(5, 56, 39, 0.15);
+    }
+
+    .split-box-card.selected {
+      border-color: var(--lime);
+      background: var(--cream-banner);
+    }
+
+    .split-box-card .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .split-box-card h3 {
+      font-size: 20px;
+      color: var(--grey-80);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .split-box-card p {
+      font-size: 14px;
+      color: var(--grey-60);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 600px) {
+      .split-box-options {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Success Panel */
     .success-panel {
       display: none;
-      text-align: center;
-      padding: 60px 24px;
-      max-width: 600px;
-      margin: 0 auto;
     }
 
     .success-panel.active {
       display: block;
     }
 
-    .success-emoji {
-      font-size: 80px;
-      margin-bottom: 24px;
+    .success-banner {
+      background: linear-gradient(135deg, var(--kale) 0%, #064d35 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin: 20px auto 40px;
+      max-width: 900px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(5, 56, 39, 0.2);
     }
 
-    .success-panel h2 {
+    .success-banner h2 {
+      font-size: clamp(20px, 4vw, 28px);
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--lime);
+    }
+
+    .success-banner p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .benefits-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    .benefits-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .benefits-header h3 {
       font-size: clamp(24px, 4vw, 32px);
       color: var(--grey-80);
       font-weight: 700;
-      margin-bottom: 16px;
-      line-height: 1.2;
+      margin-bottom: 12px;
     }
 
-    .success-panel p {
+    .benefits-header p {
       font-size: 16px;
       color: var(--grey-60);
+      line-height: 1.5;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .benefit-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .benefit-card:hover {
+      border-color: var(--lime);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(5, 56, 39, 0.1);
+    }
+
+    .benefit-card .icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .benefit-card h4 {
+      font-size: 20px;
+      color: var(--grey-80);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .benefit-card p {
+      font-size: 15px;
+      color: var(--grey-60);
       line-height: 1.6;
-      font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    .benefit-card .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--kale);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .benefit-card .btn:hover {
+      background: #064d35;
+      transform: scale(1.05);
+    }
+
+    .benefit-card .btn.whatsapp {
+      background: #25D366;
+    }
+
+    .benefit-card .btn.whatsapp:hover {
+      background: #20BA5A;
+    }
+
+    .reward-badge {
+      display: inline-block;
+      background: var(--lime);
+      color: var(--kale);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .benefits-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Loading State */
@@ -806,7 +995,35 @@
       </div>
 
       <div class="continue-btn-container">
-        <button class="continue-btn" id="continue-btn" onclick="startMealVoting()">
+        <button class="continue-btn" id="continue-btn" onclick="continueFromPreferences()">
+          Continue to Rate Meals →
+        </button>
+      </div>
+    </div>
+
+    <!-- Split Box Section -->
+    <div class="split-box-section" id="split-box-section">
+      <div class="section-header">
+        <h2>Would you like to split your delivery?</h2>
+        <p>You have a large order. We can split it into multiple boxes if you prefer.</p>
+      </div>
+
+      <div class="split-box-options">
+        <div class="split-box-card" onclick="selectSplitBox(this, 'no')" data-value="no">
+          <div class="icon">📦</div>
+          <h3>One Box</h3>
+          <p>Keep all meals in a single delivery</p>
+        </div>
+
+        <div class="split-box-card" onclick="selectSplitBox(this, 'yes')" data-value="yes">
+          <div class="icon">📦📦</div>
+          <h3>Split Box</h3>
+          <p>Divide meals into multiple boxes</p>
+        </div>
+      </div>
+
+      <div class="continue-btn-container">
+        <button class="continue-btn" id="split-continue-btn" onclick="continueFromSplitBox()" disabled>
           Continue to Rate Meals →
         </button>
       </div>
@@ -819,12 +1036,65 @@
 
     <!-- Success Panel -->
     <div class="success-panel" id="success-panel">
-      <div class="success-emoji">🎉</div>
-      <h2>£5 credit added to your account!</h2>
-      <p>Thank you for helping us personalize your meal recommendations. Your credit will be automatically applied to your next order.</p>
-      <a href="https://www.frive.co.uk/my-account" class="continue-btn" style="margin-top: 24px; text-decoration: none; display: inline-block;">
-        Go to MyAccount →
-      </a>
+      <!-- Success Banner -->
+      <div class="success-banner">
+        <h2>🎉 £5 credit added to your account!</h2>
+        <p>Your credit will be automatically applied to your next order. Welcome to Frive!</p>
+      </div>
+
+      <!-- Benefits Section -->
+      <div class="benefits-container">
+        <div class="benefits-header">
+          <h3>Welcome to the Frive Family</h3>
+          <p>Here's everything you need to know to make the most of your membership</p>
+        </div>
+
+        <div class="benefits-grid">
+          <!-- Freya Chatbot -->
+          <div class="benefit-card">
+            <span class="icon">💬</span>
+            <h4>Meet Freya, Your AI Assistant</h4>
+            <p>Got questions? Chat with Freya on WhatsApp for instant help with deliveries, meal changes, and more.</p>
+            <a href="https://wa.me/447957621162" target="_blank" class="btn whatsapp">
+              💚 Chat on WhatsApp
+            </a>
+          </div>
+
+          <!-- Rewards Programme -->
+          <div class="benefit-card">
+            <span class="icon">🎁</span>
+            <span class="reward-badge">WEEK 1 BONUS</span>
+            <h4>Free Breakfast Included!</h4>
+            <p>As a thank you, your first week includes a complimentary breakfast. Plus, earn rewards with every order!</p>
+            <a href="https://www.frive.co.uk/rewards" class="btn">
+              View Rewards →
+            </a>
+          </div>
+
+          <!-- Frive App -->
+          <div class="benefit-card">
+            <span class="icon">📱</span>
+            <h4>Download the Frive App</h4>
+            <p>Change your meals, track deliveries, and manage your account on the go. Available now on iOS.</p>
+            <a href="https://apps.apple.com/gb/app/frive-formerly-lions-prep/id6443897554" target="_blank" class="btn">
+              Download on App Store →
+            </a>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="benefit-card" style="max-width: 100%; text-align: left;">
+          <h4 style="text-align: center; margin-bottom: 20px;">💡 Quick Tips</h4>
+          <p><strong>📦 Track your delivery:</strong> Ask Freya "Where is my delivery?" on WhatsApp</p>
+          <p><strong>🍽️ Change meals:</strong> Use the app or message Freya "I would like to change my meals"</p>
+          <p><strong>⏸️ Pause anytime:</strong> Manage your subscription easily in your account</p>
+          <p style="margin-bottom: 0; text-align: center; margin-top: 24px;">
+            <a href="https://www.frive.co.uk/my-account" class="btn">
+              Go to My Account →
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -855,7 +1125,9 @@
       creditClaimed: false,
       askPreferences: true, // Flag from Supabase
       askMealRatings: true,  // Flag from Supabase
-      meals: [] // Meals loaded from Supabase
+      meals: [], // Meals loaded from Supabase
+      config: null, // Full config object from Supabase
+      splitBoxPreference: null // 'yes' or 'no'
     };
 
     // Placeholder meals - will be replaced with actual menu items
@@ -903,14 +1175,27 @@
           // If no config found, create default one
           if (error.code === 'PGRST116') {
             await createDefaultConfig(orderId);
-            return { askPreferences: true, askMealRatings: true };
+            return { 
+              askPreferences: true, 
+              askMealRatings: true, 
+              askSplitBox: false,
+              numberOfMeals: 0,
+              deliveryDay: null
+            };
           }
           throw error;
         }
 
+        // Determine if we should ask about split box
+        const shouldAskSplitBox = data.number_of_meals > 12 && 
+                                  (data.delivery_day === 'Sun' || data.delivery_day === 'Mon');
+
         return {
           askPreferences: data.ask_preferences,
-          askMealRatings: data.ask_meal_ratings
+          askMealRatings: data.ask_meal_ratings,
+          askSplitBox: shouldAskSplitBox,
+          numberOfMeals: data.number_of_meals,
+          deliveryDay: data.delivery_day
         };
       } catch (error) {
         console.error('Error fetching order config:', error);
@@ -1030,6 +1315,7 @@
           state.mealVotes = data.meal_votes || {};
           state.votesCount = Object.keys(state.mealVotes).length;
           state.creditClaimed = data.credit_claimed || false;
+          state.splitBoxPreference = data.split_box_preference || null;
           
           return true;
         }
@@ -1190,6 +1476,7 @@
       if (state.creditClaimed) {
         document.getElementById('intro-screen').style.display = 'none';
         document.getElementById('preferences-section').style.display = 'none';
+        document.getElementById('split-box-section').style.display = 'none';
         document.getElementById('progress-container').style.display = 'none';
         document.getElementById('meal-voting-container').style.display = 'none';
         document.getElementById('success-panel').classList.add('active');
@@ -1224,13 +1511,87 @@
       }
     }
 
+    /**
+     * Continue from preferences section
+     * Decides whether to show split box question or go straight to meal voting
+     */
+    async function continueFromPreferences() {
+      await savePreferencesToDB();
+      
+      // Check if we need to ask about split box
+      if (state.config && state.config.askSplitBox) {
+        // Hide preferences and show split box section
+        document.getElementById('preferences-section').style.display = 'none';
+        document.getElementById('split-box-section').style.display = 'block';
+      } else {
+        // Go straight to meal voting
+        startMealVoting();
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // SPLIT BOX SELECTION
+    // ═══════════════════════════════════════════════════════════
+
+    function selectSplitBox(el, value) {
+      // Remove selected from all cards
+      document.querySelectorAll('.split-box-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected to clicked card
+      el.classList.add('selected');
+      
+      // Store the preference
+      state.splitBoxPreference = value;
+      
+      // Enable continue button
+      document.getElementById('split-continue-btn').classList.add('active');
+      document.getElementById('split-continue-btn').disabled = false;
+    }
+
+    /**
+     * Continue from split box section to meal voting
+     */
+    async function continueFromSplitBox() {
+      // Save split box preference to database
+      await saveSplitBoxPreference();
+      
+      // Continue to meal voting
+      startMealVoting();
+    }
+
+    /**
+     * Save split box preference to Supabase
+     */
+    async function saveSplitBoxPreference() {
+      if (!state.orderId || !state.splitBoxPreference) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from('personalization_responses')
+          .update({
+            split_box_preference: state.splitBoxPreference,
+            updated_at: new Date().toISOString()
+          })
+          .eq('order_id', state.orderId);
+
+        if (error) throw error;
+        console.log('Split box preference saved:', state.splitBoxPreference);
+      } catch (error) {
+        console.error('Error saving split box preference:', error);
+        showError('Failed to save your preference. Please try again.');
+      }
+    }
+
     // ═══════════════════════════════════════════════════════════
     // MEAL VOTING
     // ═══════════════════════════════════════════════════════════
 
     async function startMealVoting() {
-      // Save preferences first
-      await savePreferencesToDB();
+      // Hide preferences and split box sections
+      document.getElementById('preferences-section').style.display = 'none';
+      document.getElementById('split-box-section').style.display = 'none';
       
       // Reload meals based on selected preferences
       console.log('Reloading meals based on preferences:', state.preferences);
@@ -1246,9 +1607,6 @@
       currentMealIndex = 0;
       state.votesCount = 0;
       state.mealVotes = {};
-      
-      // Hide preferences section
-      document.getElementById('preferences-section').style.display = 'none';
       
       // Show progress bar and meal voting
       document.getElementById('progress-container').classList.add('active');
@@ -1342,6 +1700,7 @@
       // Hide all other sections
       document.getElementById('intro-screen').style.display = 'none';
       document.getElementById('preferences-section').style.display = 'none';
+      document.getElementById('split-box-section').style.display = 'none';
       document.getElementById('progress-container').style.display = 'none';
       document.getElementById('meal-voting-container').style.display = 'none';
       
@@ -1434,6 +1793,8 @@
         const config = await fetchOrderConfig(orderId);
         console.log('Config received:', config);
         
+        // Store full config in state
+        state.config = config;
         state.askPreferences = config.askPreferences;
         state.askMealRatings = config.askMealRatings;
 
