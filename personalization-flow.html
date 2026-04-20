@@ -597,6 +597,12 @@
       font-size: 13px;
       font-weight: 500;
       color: var(--grey-70);
+      text-decoration: none;
+    }
+
+    .vote-btn .vote-label {
+      color: var(--grey-70) !important;
+      text-decoration: none !important;
     }
 
     .vote-btn.thumbs-up:hover {
@@ -694,7 +700,7 @@
 
   <div class="info-bar-wrap">
     <div class="info-bar">
-      💰 Tell us your preferences and rate 10 meals to claim your £5 credit!
+      💰 Rate 10 meals to claim your £5 credit!
     </div>
   </div>
 
@@ -1182,7 +1188,7 @@
       
       // Restore success state
       if (state.creditClaimed) {
-        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('intro-screen').style.display = 'none';
         document.getElementById('preferences-section').style.display = 'none';
         document.getElementById('progress-container').style.display = 'none';
         document.getElementById('meal-voting-container').style.display = 'none';
@@ -1333,10 +1339,17 @@
       // Mark credit as claimed in Supabase
       await markCreditClaimed();
       
-      document.getElementById('main-header').style.display = 'none';
+      // Hide all other sections
+      document.getElementById('intro-screen').style.display = 'none';
+      document.getElementById('preferences-section').style.display = 'none';
       document.getElementById('progress-container').style.display = 'none';
       document.getElementById('meal-voting-container').style.display = 'none';
+      
+      // Show success panel
       document.getElementById('success-panel').classList.add('active');
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ═══════════════════════════════════════════════════════════

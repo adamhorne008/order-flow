@@ -289,14 +289,29 @@
           <span class="flow-status status-testing">🆕 New Version</span>
         </a>
 
-        <a href="personalization-flow.html?order_id=127313" class="flow-card">
+        <div class="flow-card" style="cursor: default;">
           <div class="flow-card-header">
             <div class="flow-icon">✨</div>
             <h3>Personalization Questionnaire</h3>
           </div>
           <p>6-step personalization flow. Complete all questions and claim £5 credit!</p>
+          <div style="margin-top: 12px; display: flex; gap: 8px; align-items: center;">
+            <input 
+              type="text" 
+              id="order-id-input" 
+              placeholder="Enter Order ID" 
+              style="flex: 1; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-family: 'FriveJokker', Arial, sans-serif; font-size: 14px;"
+              value="127313"
+            />
+            <button 
+              onclick="launchPersonalization()" 
+              style="padding: 10px 20px; background: var(--kale); color: white; border: none; border-radius: 8px; font-family: 'FriveJokker', Arial, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap;"
+            >
+              Launch
+            </button>
+          </div>
           <span class="flow-status status-testing">🎁 £5 Credit</span>
-        </a>
+        </div>
       </div>
     </div>
 
@@ -364,6 +379,32 @@
       
       alert(message);
     }
+
+    function launchPersonalization() {
+      const orderIdInput = document.getElementById('order-id-input');
+      const orderId = orderIdInput.value.trim();
+      
+      if (!orderId) {
+        alert('⚠️ Please enter an Order ID');
+        orderIdInput.focus();
+        return;
+      }
+      
+      // Navigate to personalization flow with the order ID
+      window.location.href = `personalization-flow.html?order_id=${orderId}`;
+    }
+
+    // Allow Enter key to launch
+    document.addEventListener('DOMContentLoaded', function() {
+      const orderIdInput = document.getElementById('order-id-input');
+      if (orderIdInput) {
+        orderIdInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            launchPersonalization();
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>
