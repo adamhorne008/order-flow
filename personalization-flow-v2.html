@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalize Your Meals - Frive</title>
+  <style>
+    /* ── Frive Fonts ── */
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 900; 
+      src: url("fonts/JokkerTRIAL-Heavy.otf") format("opentype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 700; 
+      font-style: normal; 
+      src: url("fonts/FriveJokker-Bold.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 700; 
+      font-style: italic; 
+      src: url("fonts/FriveJokker-BoldItalic.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 500; 
+      font-style: normal; 
+      src: url("fonts/FriveJokker-Medium.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 500; 
+      font-style: italic; 
+      src: url("fonts/FriveJokker-MediumItalic.ttf") format("truetype"); 
+      font-display: swap;
+    }
+    @font-face { 
+      font-family: FriveJokker; 
+      font-weight: 400; 
+      font-style: normal; 
+      src: url("fonts/FriveJokker-Regular.ttf") format("truetype"); 
+      font-display: swap;
+    }
+
+    /* ── CSS VARIABLES ── */
+    :root {
+      --kale: #053827;
+      --lime: #C6F432;
+      --cream-banner: #FFF7E8;
+      --border: #E0E0E0;
+      --grey-60: #666;
+      --grey-80: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: FriveJokker, Arial, sans-serif;
+      background: #FAFAFA;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* ════════════════════════════════
+       HEADER
+    ════════════════════════════════ */
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-link {
+      display: block;
+    }
+
+    .logo-link svg {
+      height: 32px;
+      width: auto;
+    }
+
+    .reset-btn {
+      background: white;
+      color: var(--kale);
+      border: 2px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: FriveJokker, Arial, sans-serif;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--kale);
+      background: #F0F8F5;
+    }
+
+    /* ════════════════════════════════
+       INFO BAR
+    ════════════════════════════════ */
+    .info-bar-wrap {
+      background: var(--cream-banner);
+      border-bottom: 1px solid #E8D7B8;
+    }
+
+    .info-bar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--grey-80);
+    }
+
+    /* ════════════════════════════════
+       MAIN CONTENT
+    ════════════════════════════════ */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .main-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .main-header h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      color: var(--grey-80);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .main-header .subtitle {
+      font-size: 16px;
+      color: var(--grey-60);
+      font-weight: 400;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      display: none;
+      max-width: 800px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
+    }
+
+    .progress-container.active {
+      display: block;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .progress-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--kale);
+    }
+
+    .progress-count {
+      font-size: 14px;
+      color: var(--grey-80);
+    }
+
+    .progress-bar-track {
+      height: 12px;
+      background: #f5f5f5;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--kale) 0%, var(--lime) 100%);
+      border-radius: 20px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ════════════════════════════════
+       PREFERENCE CARDS
+    ════════════════════════════════ */
+    .preferences-section {
+      max-width: 900px;
+      margin: 0 auto;
+      animation: slideDown 0.4s ease;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .section-header h2 {
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 700;
+      color: var(--grey-80);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .section-header p {
+      font-size: 14px;
+      color: var(--grey-60);
+      font-weight: 400;
+    }
+
+    .pref-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .pref-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .pref-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pref-card:hover {
+      border-color: var(--kale);
+      transform: translateY(-2px);
+    }
+
+    .pref-card.selected {
+      border-color: var(--kale);
+      background: #F0F8F5;
+    }
+
+    .pref-card-inner {
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pref-card-icon {
+      font-size: 48px;
+      line-height: 1;
+      position: relative;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .emoji {
+      font-size: 48px;
+      display: block;
+    }
+
+    .pref-card.selected .emoji {
+      display: none;
+    }
+
+    .check-icon {
+      display: none;
+      width: 48px;
+      height: 48px;
+    }
+
+    .pref-card.selected .check-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .check-icon svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .pref-card-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--grey-80);
+      text-align: center;
+    }
+
+    .pref-card.selected .pref-card-label {
+      color: var(--kale);
+      font-weight: 700;
+    }
+
+    @keyframes slideDown {
+      from { 
+        opacity: 0; 
+        transform: translateY(-20px);
+        max-height: 0;
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+        max-height: 2000px;
+      }
+    }
+
+    /* Continue Button */
+    .continue-btn-container {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .continue-btn {
+      display: none;
+      background: var(--kale);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: FriveJokker, Arial, sans-serif;
+    }
+
+    .continue-btn.active {
+      display: inline-block;
+    }
+
+    .continue-btn:hover {
+      background: #075d3f;
+      transform: scale(1.05);
+    }
+
+    /* Meal Voting */
+    .meal-voting-container {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+      animation: slideDown 0.4s ease;
+    }
+
+    .meal-voting-container.active {
+      display: block;
+    }
+
+    .meal-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .meal-image-placeholder {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, #E8F5E9 0%, #FFF9C4 100%);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+    }
+
+    .meal-name {
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 700;
+      color: var(--grey-80);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .meal-description {
+      font-size: 15px;
+      color: var(--grey-60);
+      margin-bottom: 32px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .voting-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .vote-btn {
+      flex: 1;
+      padding: 20px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .vote-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--kale);
+    }
+
+    .vote-btn.thumbs-up:hover {
+      background: #F0F8F5;
+      border-color: #4CAF50;
+    }
+
+    .vote-btn.thumbs-down:hover {
+      background: #FFF5F5;
+      border-color: #F44336;
+    }
+
+    /* Success Panel */
+    .success-panel {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .success-panel.active {
+      display: block;
+    }
+
+    .success-emoji {
+      font-size: 80px;
+      margin-bottom: 24px;
+    }
+
+    .success-panel h2 {
+      font-size: clamp(24px, 4vw, 32px);
+      color: var(--grey-80);
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .success-panel p {
+      font-size: 16px;
+      color: var(--grey-60);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a href="#" class="logo-link">
+        <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+          <text x="5" y="30" font-family="FriveJokker, Arial, sans-serif" font-size="32" font-weight="700" fill="#053827">Frive</text>
+        </svg>
+      </a>
+      <button class="reset-btn" onclick="resetDemo()">🔄 Reset Demo</button>
+    </div>
+  </header>
+
+  <div class="info-bar-wrap">
+    <div class="info-bar">
+      💰 Tell us your preferences and rate 10 meals to claim your £5 credit!
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="main-header" id="main-header">
+      <h1>Help us personalise your meals</h1>
+      <p class="subtitle">Tell us what you like, then rate some of our meals</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progress-container">
+      <div class="progress-header">
+        <span class="progress-text">Rate meals to unlock your £5 credit</span>
+        <span class="progress-count"><span id="votes-count">0</span>/10 rated</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Preferences Section -->
+    <div class="preferences-section active" id="preferences-section">
+      <div class="section-header">
+        <h2>What type of meals do you prefer?</h2>
+        <p>Select all that apply</p>
+      </div>
+
+      <div class="pref-grid">
+        <div class="pref-card" onclick="togglePreference(this)" data-value="meat">
+          <div class="pref-card-inner">
+            <div class="pref-card-icon">
+              <span class="emoji">🥩</span>
+              <div class="check-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="11" fill="#4CAF50"/>
+                  <path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <span class="pref-card-label">Meat Lover</span>
+          </div>
+        </div>
+
+        <div class="pref-card" onclick="togglePreference(this)" data-value="fish">
+          <div class="pref-card-inner">
+            <div class="pref-card-icon">
+              <span class="emoji">🐟</span>
+              <div class="check-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="11" fill="#4CAF50"/>
+                  <path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <span class="pref-card-label">Seafood</span>
+          </div>
+        </div>
+
+        <div class="pref-card" onclick="togglePreference(this)" data-value="vegetarian">
+          <div class="pref-card-inner">
+            <div class="pref-card-icon">
+              <span class="emoji">🥗</span>
+              <div class="check-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="11" fill="#4CAF50"/>
+                  <path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <span class="pref-card-label">Vegetarian</span>
+          </div>
+        </div>
+
+        <div class="pref-card" onclick="togglePreference(this)" data-value="vegan">
+          <div class="pref-card-inner">
+            <div class="pref-card-icon">
+              <span class="emoji">🌱</span>
+              <div class="check-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="11" fill="#4CAF50"/>
+                  <path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <span class="pref-card-label">Vegan</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="continue-btn-container">
+        <button class="continue-btn" id="continue-btn" onclick="startMealVoting()">
+          Continue to Rate Meals →
+        </button>
+      </div>
+    </div>
+
+    <!-- Meal Voting Section -->
+    <div class="meal-voting-container" id="meal-voting-container">
+      <!-- Meal cards will be dynamically inserted here -->
+    </div>
+
+    <!-- Success Panel -->
+    <div class="success-panel" id="success-panel">
+      <div class="success-emoji">🎉</div>
+      <h2>£5 credit added to your account!</h2>
+      <p>Thank you for helping us personalize your meal recommendations. Your credit will be automatically applied to your next order.</p>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    const state = {
+      preferences: [],
+      mealVotes: {}, // stores meal_id: 'up' or 'down'
+      votesCount: 0,
+      creditClaimed: false
+    };
+
+    // Placeholder meals - will be replaced with actual menu items
+    const placeholderMeals = [
+      { id: 1, name: 'Creamy Tuscan Chicken', description: 'Pan-seared chicken breast in a sun-dried tomato cream sauce with spinach and parmesan', emoji: '🍗' },
+      { id: 2, name: 'Thai Red Curry', description: 'Fragrant coconut curry with vegetables, fresh herbs and jasmine rice', emoji: '🍛' },
+      { id: 3, name: 'BBQ Pulled Pork Tacos', description: 'Slow-cooked pulled pork with tangy BBQ sauce, slaw and lime crema', emoji: '🌮' },
+      { id: 4, name: 'Mediterranean Lamb Kofta', description: 'Spiced lamb koftas with tzatziki, fresh salad and warm flatbread', emoji: '🥙' },
+      { id: 5, name: 'Teriyaki Salmon Bowl', description: 'Glazed salmon fillet with edamame, pickled ginger and sticky rice', emoji: '🐟' },
+      { id: 6, name: 'Mushroom Risotto', description: 'Creamy arborio rice with wild mushrooms, truffle oil and parmesan', emoji: '🍄' },
+      { id: 7, name: 'Korean Beef Bibimbap', description: 'Marinated beef with kimchi, vegetables, fried egg and gochujang', emoji: '🍚' },
+      { id: 8, name: 'Italian Meatball Marinara', description: 'Handmade beef meatballs in rich tomato sauce with spaghetti', emoji: '🍝' },
+      { id: 9, name: 'Cajun Chicken Pasta', description: 'Spicy cajun chicken with peppers in a creamy garlic sauce', emoji: '🌶️' },
+      { id: 10, name: 'Veggie Buddha Bowl', description: 'Roasted vegetables, quinoa, avocado with tahini dressing', emoji: '🥗' }
+    ];
+
+    let currentMealIndex = 0;
+
+    // Save and load state
+    function saveState() {
+      sessionStorage.setItem('personalizationState', JSON.stringify(state));
+    }
+
+    function loadState() {
+      const saved = sessionStorage.getItem('personalizationState');
+      if (saved) {
+        Object.assign(state, JSON.parse(saved));
+        restoreUIFromState();
+      }
+    }
+
+    function restoreUIFromState() {
+      // Restore preferences
+      state.preferences.forEach(value => {
+        const card = document.querySelector(`.pref-card[data-value="${value}"]`);
+        if (card) card.classList.add('selected');
+      });
+      
+      // Show continue button if preferences selected
+      if (state.preferences.length > 0) {
+        document.getElementById('continue-btn').classList.add('active');
+      }
+      
+      // If preferences selected and votes started, show meal voting
+      if (state.preferences.length > 0 && state.votesCount > 0) {
+        currentMealIndex = state.votesCount;
+        startMealVoting();
+      }
+      
+      // Restore success state
+      if (state.creditClaimed) {
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('preferences-section').style.display = 'none';
+        document.getElementById('progress-container').style.display = 'none';
+        document.getElementById('meal-voting-container').style.display = 'none';
+        document.getElementById('success-panel').classList.add('active');
+      }
+    }
+
+    // Preference selection
+    function togglePreference(el) {
+      const value = el.dataset.value;
+      const index = state.preferences.indexOf(value);
+      
+      if (index > -1) {
+        state.preferences.splice(index, 1);
+        el.classList.remove('selected');
+      } else {
+        state.preferences.push(value);
+        el.classList.add('selected');
+      }
+      
+      saveState();
+      
+      // Show/hide continue button
+      const continueBtn = document.getElementById('continue-btn');
+      if (state.preferences.length > 0) {
+        continueBtn.classList.add('active');
+      } else {
+        continueBtn.classList.remove('active');
+      }
+    }
+
+    // Meal voting functions
+    function startMealVoting() {
+      // Hide preferences section
+      document.getElementById('preferences-section').style.display = 'none';
+      
+      // Show progress bar and meal voting
+      document.getElementById('progress-container').classList.add('active');
+      document.getElementById('meal-voting-container').classList.add('active');
+      
+      // Render first meal
+      renderCurrentMeal();
+      updateProgressBar();
+    }
+
+    function renderCurrentMeal() {
+      if (currentMealIndex >= placeholderMeals.length) {
+        // All meals rated, show success
+        showSuccess();
+        return;
+      }
+
+      const meal = placeholderMeals[currentMealIndex];
+      const container = document.getElementById('meal-voting-container');
+      
+      container.innerHTML = `
+        <div class="meal-card">
+          <div class="meal-image-placeholder">${meal.emoji}</div>
+          <h3 class="meal-name">${meal.name}</h3>
+          <p class="meal-description">${meal.description}</p>
+          <div class="voting-buttons">
+            <button class="vote-btn thumbs-down" onclick="voteMeal(${meal.id}, 'down')">
+              👎
+            </button>
+            <button class="vote-btn thumbs-up" onclick="voteMeal(${meal.id}, 'up')">
+              👍
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function voteMeal(mealId, vote) {
+      // Save the vote
+      state.mealVotes[mealId] = vote;
+      state.votesCount++;
+      saveState();
+
+      // Update progress bar
+      updateProgressBar();
+
+      // Move to next meal
+      currentMealIndex++;
+      renderCurrentMeal();
+    }
+
+    function updateProgressBar() {
+      const progress = (state.votesCount / 10) * 100;
+      document.getElementById('progress-bar-fill').style.width = progress + '%';
+      document.getElementById('votes-count').textContent = state.votesCount;
+    }
+
+    function showSuccess() {
+      document.getElementById('main-header').style.display = 'none';
+      document.getElementById('progress-container').style.display = 'none';
+      document.getElementById('meal-voting-container').style.display = 'none';
+      document.getElementById('success-panel').classList.add('active');
+      state.creditClaimed = true;
+      saveState();
+    }
+
+    function resetDemo() {
+      // Clear storage
+      sessionStorage.removeItem('personalizationState');
+      
+      // Reset state
+      state.preferences = [];
+      state.mealVotes = {};
+      state.votesCount = 0;
+      state.creditClaimed = false;
+      
+      // IMPORTANT: Reset meal index to start from beginning
+      currentMealIndex = 0;
+      
+      // Show main header and preferences
+      document.getElementById('main-header').style.display = 'block';
+      document.getElementById('preferences-section').style.display = 'block';
+      
+      // Hide success panel
+      document.getElementById('success-panel').classList.remove('active');
+      
+      // Reset all selections
+      document.querySelectorAll('.pref-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Hide continue button
+      document.getElementById('continue-btn').classList.remove('active');
+      
+      // Hide progress and voting
+      document.getElementById('progress-container').classList.remove('active');
+      document.getElementById('meal-voting-container').classList.remove('active');
+      
+      // Clear meal voting container to reset meals
+      document.getElementById('meal-voting-container').innerHTML = '';
+      
+      // Reset progress bar
+      document.getElementById('progress-bar-fill').style.width = '0%';
+      document.getElementById('votes-count').textContent = '0';
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadState();
+    });
+  </script>
+</body>
+</html>

@@ -455,15 +455,38 @@
       color: #000;
       line-height: 1.3;
       text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .breakfast-card-nutrition {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-size: 10px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    
+    .breakfast-kcal,
+    .breakfast-protein,
+    .breakfast-carbs,
+    .breakfast-fat {
+      display: inline-block;
+      font-weight: 500;
+    }
+    
+    .breakfast-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: #053827;
+      text-align: center;
     }
 
     /* Hide breakfast details - no longer needed */
     .breakfast-badges,
     .breakfast-badge,
-    .breakfast-card-desc,
-    .breakfast-card-nutrition,
-    .breakfast-kcal,
-    .breakfast-protein {
+    .breakfast-card-desc {
       display: none;
     }
 
@@ -1354,28 +1377,23 @@
   // ── Fetch Breakfast Items from API ──────
   async function fetchBreakfastItems() {
     try {
-      const response = await fetch('https://www.frive.co.uk/api/klaviyo/product-catalog');
-      const products = await response.json();
+      const response = await fetch('https://www.frive.co.uk/api/js/v1/menu?orderPriceData=%7B%22basePricingTabId%22%3A3%7D');
+      const data = await response.json();
       
-      // Get current date
-      const today = new Date();
+      // Find the meals array in the response (could be at root or nested)
+      let meals = data.meals || data.items || data;
+      if (!Array.isArray(meals)) {
+        console.error('Could not find meals array in API response');
+        document.getElementById('breakfastShowcaseWrapper').style.display = 'none';
+        return;
+      }
       
-      // Filter breakfast items and find closest menu date
-      const breakfasts = products.filter(item => 
-        item.categories && item.categories.includes('Breakfast')
-      );
+      // Filter to only breakfast items (category === 5)
+      const breakfasts = meals.filter(meal => meal.category === 5);
       
-      // Sort by menu date (closest to today)
-      breakfasts.sort((a, b) => {
-        const dateA = new Date(a.$menu_date);
-        const dateB = new Date(b.$menu_date);
-        const diffA = Math.abs(dateA - today);
-        const diffB = Math.abs(dateB - today);
-        return diffA - diffB;
-      });
-      
-      // Get first 3 breakfast items
-      breakfastItems = breakfasts.slice(0, 3);
+      // Pick 3 at random
+      const shuffled = breakfasts.sort(() => 0.5 - Math.random());
+      breakfastItems = shuffled.slice(0, 3);
       
       // Render breakfast cards if we have items
       if (breakfastItems.length > 0) {
@@ -1403,19 +1421,47 @@
       return;
     }
     
-    container.innerHTML = breakfastItems.map(item => `
-      <div class="breakfast-card">
-        <img src="${item.$image_link}" alt="${item.$title}" class="breakfast-card-img" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-        <div class="breakfast-card-content">
-          <h4 class="breakfast-card-title">${item.$title}</h4>
+    container.innerHTML = breakfastItems.map(meal => {
+      const item = meal.targetMenuItem;
+      if (!item) {
+        console.warn('No targetMenuItem found for meal:', meal);
+        return '';
+      }
+      
+      // Get image URL
+      const imageUrl = item.medias && item.medias[0] && item.medias[0].url 
+        ? `https://www.frive.co.uk${item.medias[0].url}` 
+        : 'https://via.placeholder.com/150?text=No+Image';
+      
+      // Get nutrition info
+      const calories = item.adjustedCalories || 0;
+      const protein = item.adjustedProteins || 0;
+      const carbs = item.adjustedCarbs || 0;
+      const fat = item.adjustedFat || 0;
+      const price = item.price || 0;
+      
+      return `
+        <div class="breakfast-card">
+          <img src="${imageUrl}" alt="${item.title}" class="breakfast-card-img" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+          <div class="breakfast-card-content">
+            <h4 class="breakfast-card-title">${item.title}</h4>
+            <div class="breakfast-card-nutrition">
+              <span class="breakfast-kcal">${calories} kcal</span>
+              <span class="breakfast-protein">P: ${protein}g</span>
+              <span class="breakfast-carbs">C: ${carbs}g</span>
+              <span class="breakfast-fat">F: ${fat}g</span>
+            </div>
+            <div class="breakfast-price">£${price.toFixed(2)}</div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // Load saved state on page load
   window.addEventListener('DOMContentLoaded', () => {
     loadState();
+    fetchBreakfastItems(); // Fetch breakfast items from API
   });
 
   // ── Build newOrderFlowModel ─────────────

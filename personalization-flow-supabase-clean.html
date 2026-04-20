@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalise Your Menu</title>
+  <style>
+    @font-face {
+      font-family: 'Perfectly Nineties';
+      src: url('fonts/PerfectlyNineties-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Perfectly Nineties';
+      src: url('fonts/PerfectlyNineties-Italic.otf') format('opentype');
+      font-weight: normal;
+      font-style: italic;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Perfectly Nineties', Arial, sans-serif;
+      background-color: #FFF4E6;
+      color: #333;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #D32F2F;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    .preference-section {
+      margin-bottom: 30px;
+    }
+
+    .preference-section h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #D32F2F;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #FFF4E6;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+
+    .checkbox-item:hover {
+      background: #FFE8CC;
+    }
+
+    .checkbox-item.selected {
+      background: #FFD4A3;
+      border-color: #D32F2F;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      margin-right: 10px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .checkbox-item label {
+      cursor: pointer;
+      font-size: 16px;
+      flex: 1;
+    }
+
+    /* Meal Rating Section */
+    .meal-rating-section {
+      display: none;
+    }
+
+    .meal-rating-section.active {
+      display: block;
+    }
+
+    .meal-card {
+      background: #FFF4E6;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .meal-name {
+      font-size: 24px;
+      color: #D32F2F;
+      margin-bottom: 10px;
+    }
+
+    .meal-description {
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .vote-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .vote-btn {
+      background: white;
+      border: 3px solid #D32F2F;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      font-size: 40px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vote-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .vote-btn.selected {
+      background: #D32F2F;
+      transform: scale(1.1);
+    }
+
+    /* Progress indicator */
+    .progress-indicator {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+      color: #D32F2F;
+      font-weight: bold;
+    }
+
+    /* Navigation buttons */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Perfectly Nineties', Arial, sans-serif;
+    }
+
+    .btn-primary {
+      background: #D32F2F;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #B71C1C;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary {
+      background: #FFF4E6;
+      color: #D32F2F;
+      border: 2px solid #D32F2F;
+    }
+
+    .btn-secondary:hover {
+      background: #FFE8CC;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Success section */
+    .success-section {
+      display: none;
+      text-align: center;
+    }
+
+    .success-section.active {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    .success-message {
+      font-size: 24px;
+      color: #D32F2F;
+      margin-bottom: 15px;
+    }
+
+    .credit-amount {
+      font-size: 36px;
+      color: #4CAF50;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .reset-btn {
+      margin-top: 20px;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 18px;
+      color: #666;
+    }
+
+    /* Hide sections by default */
+    .preference-section,
+    .meal-rating-section,
+    .success-section {
+      display: none;
+    }
+
+    .preference-section.active,
+    .meal-rating-section.active,
+    .success-section.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍕 Personalise Your Menu</h1>
+    <p class="subtitle">Help us tailor your perfect meal plan and earn £5 credit!</p>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading">
+      Loading your personalization flow...
+    </div>
+
+    <!-- Preference Selection Section -->
+    <div id="preferenceSection" class="preference-section">
+      <h2>What are your dietary preferences?</h2>
+      <p style="color: #666; margin-bottom: 15px; font-size: 14px;">Select all that apply</p>
+      
+      <div class="checkbox-group">
+        <div class="checkbox-item" onclick="togglePreference(this, 'vegetarian')">
+          <input type="checkbox" id="pref-vegetarian" value="vegetarian">
+          <label for="pref-vegetarian">🥗 Vegetarian</label>
+        </div>
+        <div class="checkbox-item" onclick="togglePreference(this, 'vegan')">
+          <input type="checkbox" id="pref-vegan" value="vegan">
+          <label for="pref-vegan">🌱 Vegan</label>
+        </div>
+        <div class="checkbox-item" onclick="togglePreference(this, 'gluten-free')">
+          <input type="checkbox" id="pref-gluten-free" value="gluten-free">
+          <label for="pref-gluten-free">🌾 Gluten-Free</label>
+        </div>
+        <div class="checkbox-item" onclick="togglePreference(this, 'dairy-free')">
+          <input type="checkbox" id="pref-dairy-free" value="dairy-free">
+          <label for="pref-dairy-free">🥛 Dairy-Free</label>
+        </div>
+        <div class="checkbox-item" onclick="togglePreference(this, 'low-carb')">
+          <input type="checkbox" id="pref-low-carb" value="low-carb">
+          <label for="pref-low-carb">🥑 Low-Carb</label>
+        </div>
+        <div class="checkbox-item" onclick="togglePreference(this, 'high-protein')">
+          <input type="checkbox" id="pref-high-protein" value="high-protein">
+          <label for="pref-high-protein">💪 High-Protein</label>
+        </div>
+        <div class="checkbox-item" onclick="togglePreference(this, 'none')">
+          <input type="checkbox" id="pref-none" value="none">
+          <label for="pref-none">🍽️ No Specific Preferences</label>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn btn-primary" onclick="startMealRatings()">Continue to Meal Ratings →</button>
+      </div>
+    </div>
+
+    <!-- Meal Rating Section -->
+    <div id="mealRatingSection" class="meal-rating-section">
+      <div class="progress-indicator" id="progressIndicator">
+        Rated <span id="ratedCount">0</span> of 10 meals
+      </div>
+
+      <div id="mealContainer"></div>
+    </div>
+
+    <!-- Success Section -->
+    <div id="successSection" class="success-section">
+      <div class="success-icon">🎉</div>
+      <div class="success-message">Thank you for personalising your menu!</div>
+      <p>Your preferences have been saved and you've earned:</p>
+      <div class="credit-amount">£5 Credit</div>
+      <p style="color: #666;">This will be applied to your next order automatically.</p>
+      <button class="btn btn-primary reset-btn" onclick="resetDemo()">Try Demo Again</button>
+    </div>
+  </div>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // SUPABASE CONFIGURATION
+    // ═══════════════════════════════════════════════════════════
+    
+    const SUPABASE_URL = 'https://fhwkyeccpqtdidnexxrr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZod2t5ZWNjcHF0ZGlkbmV4eHJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MzE5NDMsImV4cCI6MjA5MjIwNzk0M30.PLfHEo0ZIbJ8H9-66L4SkrkH3WyH9HEuBjlOf9qMs5c';
+    
+    // Initialize Supabase client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ═══════════════════════════════════════════════════════════
+    // STATE MANAGEMENT
+    // ═══════════════════════════════════════════════════════════
+    
+    const state = {
+      orderId: null,
+      preferences: [],
+      mealVotes: {}, // stores meal_id: 'up' or 'down'
+      votesCount: 0,
+      creditClaimed: false,
+      askPreferences: true, // Flag from Supabase
+      askMealRatings: true  // Flag from Supabase
+    };
+
+    // Placeholder meals - will be replaced with actual menu items
+    const meals = [
+      { id: 'meal-1', name: 'Margherita Pizza', description: 'Classic tomato, mozzarella & basil' },
+      { id: 'meal-2', name: 'Caesar Salad', description: 'Crispy romaine, parmesan & croutons' },
+      { id: 'meal-3', name: 'Chicken Tikka Masala', description: 'Tender chicken in creamy curry sauce' },
+      { id: 'meal-4', name: 'Beef Burger', description: 'Juicy beef patty with all the toppings' },
+      { id: 'meal-5', name: 'Vegetable Stir Fry', description: 'Fresh veggies in savory sauce' },
+      { id: 'meal-6', name: 'Salmon Teriyaki', description: 'Glazed salmon with steamed rice' },
+      { id: 'meal-7', name: 'Pasta Carbonara', description: 'Creamy bacon & parmesan pasta' },
+      { id: 'meal-8', name: 'Greek Salad', description: 'Feta, olives, cucumber & tomatoes' },
+      { id: 'meal-9', name: 'Thai Green Curry', description: 'Coconut curry with vegetables' },
+      { id: 'meal-10', name: 'Fish & Chips', description: 'Crispy battered fish with fries' }
+    ];
+
+    let currentMealIndex = 0;
+
+    // ═══════════════════════════════════════════════════════════
+    // SUPABASE FUNCTIONS
+    // ═══════════════════════════════════════════════════════════
+
+    /**
+     * Fetch order configuration from Supabase
+     * Returns flags for which questions to ask
+     */
+    async function fetchOrderConfig(orderId) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('personalization_config')
+          .select('*')
+          .eq('order_id', orderId)
+          .single();
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // No config found, create default
+            console.log('No config found for order, creating default...');
+            return await createDefaultConfig(orderId);
+          }
+          throw error;
+        }
+
+        console.log('Loaded order config:', data);
+        return data;
+      } catch (error) {
+        console.error('Error fetching order config:', error);
+        return { ask_preferences: true, ask_meal_ratings: true };
+      }
+    }
+
+    /**
+     * Create default configuration for new order
+     */
+    async function createDefaultConfig(orderId) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('personalization_config')
+          .insert([
+            { 
+              order_id: orderId,
+              ask_preferences: true,
+              ask_meal_ratings: true
+            }
+          ])
+          .select()
+          .single();
+
+        if (error) throw error;
+        console.log('Created default config:', data);
+        return data;
+      } catch (error) {
+        console.error('Error creating default config:', error);
+        return { ask_preferences: true, ask_meal_ratings: true };
+      }
+    }
+
+    /**
+     * Load existing personalization data if user is resuming
+     */
+    async function loadPersonalizationData(orderId) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('personalization_responses')
+          .select('*')
+          .eq('order_id', orderId)
+          .single();
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // No data yet, that's fine
+            return null;
+          }
+          throw error;
+        }
+
+        console.log('Loaded existing data:', data);
+        return data;
+      } catch (error) {
+        console.error('Error loading personalization data:', error);
+        return null;
+      }
+    }
+
+    /**
+     * Save preferences to Supabase
+     */
+    async function savePreferencesToDB() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('personalization_responses')
+          .upsert([
+            {
+              order_id: state.orderId,
+              preferences: state.preferences,
+              meal_votes: state.mealVotes,
+              credit_claimed: state.creditClaimed
+            }
+          ], {
+            onConflict: 'order_id'
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        console.log('Saved preferences:', data);
+        return data;
+      } catch (error) {
+        console.error('Error saving preferences:', error);
+        throw error;
+      }
+    }
+
+    /**
+     * Save individual meal vote to Supabase
+     */
+    async function saveMealVoteToDB(mealId, vote) {
+      try {
+        // Update state
+        state.mealVotes[mealId] = vote;
+
+        // Save to personalization_responses
+        const { data, error } = await supabaseClient
+          .from('personalization_responses')
+          .upsert([
+            {
+              order_id: state.orderId,
+              preferences: state.preferences,
+              meal_votes: state.mealVotes,
+              credit_claimed: state.creditClaimed
+            }
+          ], {
+            onConflict: 'order_id'
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        console.log('Saved meal vote:', { mealId, vote });
+        return data;
+      } catch (error) {
+        console.error('Error saving meal vote:', error);
+        throw error;
+      }
+    }
+
+    /**
+     * Mark credit as claimed in database
+     */
+    async function markCreditClaimed() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('personalization_responses')
+          .update({
+            credit_claimed: true,
+            completed_at: new Date().toISOString()
+          })
+          .eq('order_id', state.orderId)
+          .select()
+          .single();
+
+        if (error) throw error;
+        console.log('Marked credit as claimed:', data);
+        return data;
+      } catch (error) {
+        console.error('Error marking credit claimed:', error);
+        throw error;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // UI FUNCTIONS
+    // ═══════════════════════════════════════════════════════════
+
+    function togglePreference(element, value) {
+      const checkbox = element.querySelector('input[type="checkbox"]');
+      
+      // Handle "None" preference
+      if (value === 'none') {
+        if (!checkbox.checked) {
+          // Clear all other preferences
+          document.querySelectorAll('.checkbox-item').forEach(item => {
+            if (item !== element) {
+              item.classList.remove('selected');
+              item.querySelector('input[type="checkbox"]').checked = false;
+            }
+          });
+          state.preferences = ['none'];
+        } else {
+          state.preferences = [];
+        }
+      } else {
+        // Uncheck "None" if selecting a specific preference
+        const noneCheckbox = document.querySelector('#pref-none');
+        const noneItem = noneCheckbox.closest('.checkbox-item');
+        if (noneCheckbox.checked) {
+          noneCheckbox.checked = false;
+          noneItem.classList.remove('selected');
+        }
+        
+        // Toggle this preference
+        if (checkbox.checked) {
+          state.preferences = state.preferences.filter(p => p !== value);
+        } else {
+          state.preferences.push(value);
+        }
+      }
+      
+      // Toggle checkbox and styling
+      checkbox.checked = !checkbox.checked;
+      element.classList.toggle('selected');
+    }
+
+    async function startMealRatings() {
+      // Save preferences first
+      if (state.askPreferences) {
+        await savePreferencesToDB();
+      }
+
+      // Hide preferences, show meal ratings
+      document.getElementById('preferenceSection').classList.remove('active');
+      
+      if (state.askMealRatings) {
+        document.getElementById('mealRatingSection').classList.add('active');
+        showNextMeal();
+      } else {
+        // Skip to success
+        showSuccess();
+      }
+    }
+
+    function showNextMeal() {
+      if (currentMealIndex >= meals.length) {
+        showSuccess();
+        return;
+      }
+
+      const meal = meals[currentMealIndex];
+      const container = document.getElementById('mealContainer');
+      
+      container.innerHTML = `
+        <div class="meal-card">
+          <div class="meal-name">${meal.name}</div>
+          <div class="meal-description">${meal.description}</div>
+          <div class="vote-buttons">
+            <button class="vote-btn" onclick="voteMeal('${meal.id}', 'down')">👎</button>
+            <button class="vote-btn" onclick="voteMeal('${meal.id}', 'up')">👍</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function voteMeal(mealId, vote) {
+      // Save vote to database
+      await saveMealVoteToDB(mealId, vote);
+      
+      // Update progress
+      state.votesCount++;
+      document.getElementById('ratedCount').textContent = state.votesCount;
+      
+      // Show next meal or finish
+      currentMealIndex++;
+      
+      if (currentMealIndex < meals.length) {
+        setTimeout(() => showNextMeal(), 300);
+      } else {
+        setTimeout(() => showSuccess(), 500);
+      }
+    }
+
+    async function showSuccess() {
+      // Mark credit as claimed
+      state.creditClaimed = true;
+      await markCreditClaimed();
+
+      // Hide all sections and show success
+      document.getElementById('preferenceSection').classList.remove('active');
+      document.getElementById('mealRatingSection').classList.remove('active');
+      document.getElementById('successSection').classList.add('active');
+    }
+
+    function resetDemo() {
+      // Reset state
+      state.preferences = [];
+      state.mealVotes = {};
+      state.votesCount = 0;
+      state.creditClaimed = false;
+      currentMealIndex = 0;
+      
+      // Reset UI
+      document.getElementById('ratedCount').textContent = '0';
+      document.getElementById('mealContainer').innerHTML = '';
+      document.querySelectorAll('.checkbox-item').forEach(item => {
+        item.classList.remove('selected');
+        item.querySelector('input[type="checkbox"]').checked = false;
+      });
+      
+      // Show appropriate starting section
+      document.getElementById('successSection').classList.remove('active');
+      
+      if (state.askPreferences) {
+        document.getElementById('preferenceSection').classList.add('active');
+      } else if (state.askMealRatings) {
+        document.getElementById('mealRatingSection').classList.add('active');
+        showNextMeal();
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // INITIALIZATION
+    // ═══════════════════════════════════════════════════════════
+
+    async function initializeApp() {
+      console.log('=== INITIALIZATION START ===');
+      
+      // Get order_id from URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      state.orderId = urlParams.get('order_id');
+      
+      console.log('Order ID:', state.orderId);
+      
+      if (!state.orderId) {
+        document.getElementById('loading').innerHTML = `
+          <p style="color: #D32F2F;">⚠️ No order_id provided</p>
+          <p style="font-size: 14px; margin-top: 10px;">Please access this page with an order_id parameter.</p>
+          <p style="font-size: 12px; color: #999; margin-top: 10px;">Example: ?order_id=test-order-123</p>
+        `;
+        return;
+      }
+
+      try {
+        // Test Supabase connection
+        console.log('Testing Supabase connection...');
+        const { data: testData, error: testError } = await supabaseClient
+          .from('personalization_config')
+          .select('count')
+          .limit(1);
+        
+        if (testError) {
+          console.error('Supabase connection test failed:', testError);
+          throw new Error(`Database connection failed: ${testError.message}`);
+        }
+        
+        console.log('✓ Supabase connection successful');
+
+        // Fetch configuration for this order
+        console.log('Fetching order configuration...');
+        const config = await fetchOrderConfig(state.orderId);
+        state.askPreferences = config.ask_preferences;
+        state.askMealRatings = config.ask_meal_ratings;
+        console.log('✓ Configuration loaded:', { askPreferences: state.askPreferences, askMealRatings: state.askMealRatings });
+
+        // Load existing data if resuming
+        console.log('Loading existing personalization data...');
+        const existingData = await loadPersonalizationData(state.orderId);
+        
+        if (existingData) {
+          console.log('✓ Found existing data, resuming...');
+          state.preferences = existingData.preferences || [];
+          state.mealVotes = existingData.meal_votes || {};
+          state.votesCount = Object.keys(state.mealVotes).length;
+          state.creditClaimed = existingData.credit_claimed || false;
+
+          // If already completed, show success
+          if (state.creditClaimed) {
+            console.log('Already completed - showing success');
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('successSection').classList.add('active');
+            return;
+          }
+
+          // Restore UI state
+          state.preferences.forEach(pref => {
+            const checkbox = document.getElementById(`pref-${pref}`);
+            if (checkbox) {
+              checkbox.checked = true;
+              checkbox.closest('.checkbox-item').classList.add('selected');
+            }
+          });
+
+          document.getElementById('ratedCount').textContent = state.votesCount;
+          currentMealIndex = state.votesCount;
+        } else {
+          console.log('No existing data - starting fresh');
+        }
+
+        // Hide loading and show appropriate section
+        document.getElementById('loading').style.display = 'none';
+        
+        if (state.askPreferences && state.preferences.length === 0) {
+          console.log('Showing preferences section');
+          document.getElementById('preferenceSection').classList.add('active');
+        } else if (state.askMealRatings && state.votesCount < meals.length) {
+          console.log('Showing meal ratings section');
+          document.getElementById('mealRatingSection').classList.add('active');
+          showNextMeal();
+        } else {
+          console.log('All steps complete - showing success');
+          showSuccess();
+        }
+
+        console.log('=== INITIALIZATION COMPLETE ===');
+      } catch (error) {
+        console.error('=== INITIALIZATION ERROR ===');
+        console.error(error);
+        document.getElementById('loading').innerHTML = `
+          <p style="color: #D32F2F;">⚠️ Error loading personalization flow</p>
+          <p style="font-size: 14px; margin-top: 10px;">${error.message}</p>
+          <p style="font-size: 12px; color: #999; margin-top: 10px;">Please check the console for details.</p>
+        `;
+      }
+    }
+
+    // Start the app when DOM is ready
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  </script>
+</body>
+</html>
