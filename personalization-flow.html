@@ -140,9 +140,15 @@
        MAIN CONTENT
     ════════════════════════════════ */
     .main-content {
-      max-width: 1200px;
+      max-width: 500px;
       margin: 0 auto;
       padding: 40px 24px;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        max-width: 100%;
+      }
     }
 
     .main-header {
